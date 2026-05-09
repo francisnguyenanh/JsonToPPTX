@@ -7,6 +7,7 @@ from pptx.util import Emu
 
 from . import geometry as G
 from .validator import validate
+from .design_system import resolve_deck
 from .layouts import (
     cover, card_grid, two_col_list, flow_steps, two_col_contrast,
     data_highlight, narrative, section_divider, cta, toc, timeline,
@@ -36,14 +37,24 @@ class ValidationError(Exception):
         super().__init__("Validation failed")
 
 
+def _is_intent_deck(deck_json: dict) -> bool:
+    """True when slides have no "design" key — i.e. semantic intent JSON from Gemini."""
+    slides = deck_json.get("slides", [])
+    return bool(slides) and not any("design" in s for s in slides)
+
+
 def render_deck(deck_json: dict) -> bytes:
     """
-    1. Validate JSON against schema — raise ValidationError if invalid
-    2. Create Presentation with SLIDE_W × SLIDE_H
-    3. For each slide: call LAYOUT_MAP[layout](prs, slide_data)
-    4. Each layout calls inject_footer as its final step
-    5. Save to BytesIO, return bytes
+    1. Auto-resolve semantic intent JSON → full design JSON if needed
+    2. Validate JSON against schema — raise ValidationError if invalid
+    3. Create Presentation with SLIDE_W × SLIDE_H
+    4. For each slide: call LAYOUT_MAP[layout](prs, slide_data)
+    5. Each layout calls inject_footer as its final step
+    6. Save to BytesIO, return bytes
     """
+    if _is_intent_deck(deck_json):
+        deck_json = resolve_deck(deck_json)
+
     ok, errors = validate(deck_json)
     if not ok:
         raise ValidationError(errors)
