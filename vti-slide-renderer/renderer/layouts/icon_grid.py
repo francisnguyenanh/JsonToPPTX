@@ -36,29 +36,42 @@ def render(prs, slide_data: dict):
                          bg["from"], bg["to"],
                          border_hex=cell.get("border_top"), border_w_pt=3)
 
-        inner_x = cx + G.pt(12)
-        inner_w = cw - G.pt(24)
-        cur_y = cy + G.pt(12)
+        inner_x = cx + G.pt(8)
+        inner_w = cw - G.pt(16)
 
+        # Calculate vertical layout: icon + label + sub_label
         icon = cell.get("icon")
+        has_label = bool(cell.get("label"))
+        has_sub = bool(cell.get("sub_label"))
+        icon_sz = icon.get("size_pt", 36) if icon else 0
+        label_h = G.pt(24) if has_label else 0
+        sub_h = G.pt(20) if has_sub else 0
+        gap = G.pt(6)
+        total_h = G.pt(icon_sz) + (gap if icon_sz else 0) + label_h + sub_h
+        cur_y = cy + (ch - total_h) // 2  # vertical center
+
         if icon:
-            sz = icon.get("size_pt", 36)
-            add_semantic_icon(slide, inner_x, cur_y, sz,
+            # Horizontally centre icon
+            icon_x = cx + (cw - G.pt(icon_sz)) // 2
+            add_semantic_icon(slide, icon_x, cur_y, icon_sz,
                               icon.get("stroke", "4A9EE0"),
                               icon.get("type", "default"))
-            cur_y += G.pt(sz + 8)
+            cur_y += G.pt(icon_sz) + gap
 
-        if cell.get("label"):
-            add_textbox_styled(slide, inner_x, cur_y, inner_w, G.pt(22),
-                               cell["label"], bold=True, size_pt=G.FONT_BODY,
+        if has_label:
+            add_textbox_styled(slide, inner_x, cur_y, inner_w, label_h,
+                               cell["label"], bold=True,
+                               size_pt=G.FONT_CARD_HEADER,
                                color_hex=cell.get("label_color", "172759"),
-                               v_anchor="t", inset=G.INS_NONE, autofit="none")
-            cur_y += G.pt(24)
+                               align="center", v_anchor="m",
+                               inset=G.INS_NONE, autofit="none")
+            cur_y += label_h
 
-        if cell.get("sub_label"):
-            add_textbox_styled(slide, inner_x, cur_y, inner_w, G.pt(18),
+        if has_sub:
+            add_textbox_styled(slide, inner_x, cur_y, inner_w, sub_h,
                                cell["sub_label"], size_pt=G.FONT_SMALL,
                                color_hex=cell.get("sub_label_color", "6A7FA0"),
-                               v_anchor="t", inset=G.INS_NONE, autofit="none", wrap=True)
+                               align="center", v_anchor="t",
+                               inset=G.INS_NONE, autofit="none", wrap=True)
 
     inject_footer(slide, sn)

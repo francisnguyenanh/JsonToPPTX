@@ -8,7 +8,8 @@ from pptx.oxml.ns import qn
 from .. import geometry as G
 from ..shapes import (
     add_textbox_styled, add_badge, add_separator_line,
-    _set_gradient_fill_on_spPr, _set_solid_fill_on_spPr
+    _set_gradient_fill_on_spPr, _set_solid_fill_on_spPr,
+    add_decor_shape,
 )
 from ..footer import inject_footer
 from ._common import remove_line
@@ -30,19 +31,21 @@ def render(prs, slide_data: dict):
     remove_line(bg_shape._element.spPr)
     bg_shape.text_frame.text = ""
 
-    # ── Decorative circle ────────────────────────────────────────────
+    # ── Decor circles (Pattern 8) — top-right and bottom-left ───────
     decor_color = d.get("decor_color", "2362B0")
-    dec_sz = G.pt(280)
-    dec_shape = slide.shapes.add_shape(9, Emu(G.SLIDE_W - dec_sz // 2),
-                                        Emu(-dec_sz // 4), Emu(dec_sz), Emu(dec_sz))
-    d_spPr = dec_shape._element.spPr
-    _set_solid_fill_on_spPr(d_spPr, decor_color, alpha=20000)
-    remove_line(d_spPr)
-    dec_shape.text_frame.text = ""
+    dec_sz = G.pt(300)
+    # Top-right corner circle
+    add_decor_shape(slide, G.SLIDE_W - dec_sz // 2, -dec_sz // 4,
+                    dec_sz, dec_sz, decor_color, alpha_percent=7)
+    # Bottom-left corner circle (smaller, accent colour)
+    dec_sz2 = G.pt(220)
+    add_decor_shape(slide, -dec_sz2 // 3, G.SLIDE_H - dec_sz2 * 3 // 4,
+                    dec_sz2, dec_sz2, "7FC236", alpha_percent=6)
 
     # ── Heading ──────────────────────────────────────────────────────
-    add_textbox_styled(slide, G.CONTENT_X, G.pt(60), G.CONTENT_W, G.pt(50),
-                       d.get("heading", "Next Steps"), bold=True, size_pt=G.FONT_TITLE,
+    add_textbox_styled(slide, G.CONTENT_X, G.pt(55), G.CONTENT_W, G.pt(55),
+                       d.get("heading", "Next Steps"), bold=True,
+                       size_pt=G.FONT_CTA_HEADING,
                        color_hex=d.get("heading_color", "FFFFFF"),
                        v_anchor="m", inset=G.INS_NONE, autofit="none")
 

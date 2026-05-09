@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(Get-ChildItem -Path \"c:\\\\4. DEV\\\\GitHub\\(Onlyone\\)\\\\JsonToPPTX\" -Recurse -File)",
-      "Bash(Select-Object FullName)"
+      "Bash(Select-Object FullName)",
+      "Bash(Get-ChildItem -Recurse \"c:\\\\4. DEV\\\\GitHub\\(Onlyone\\)\\\\JsonToPPTX\")",
+      "Bash(Select-Object FullName, Length)",
+      "Bash(Sort-Object FullName)",
+      "Bash(.venv/Scripts/python -m pytest tests/ -v)"
     ]
   }
 }

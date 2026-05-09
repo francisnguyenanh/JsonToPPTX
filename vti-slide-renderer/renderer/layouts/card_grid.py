@@ -55,12 +55,12 @@ def render(prs, slide_data: dict):
 
         # Header
         if card.get("header"):
-            add_textbox_styled(slide, inner_x, cur_y, inner_w, G.pt(24),
+            add_textbox_styled(slide, inner_x, cur_y, inner_w, G.pt(30),
                                card["header"], bold=True,
-                               size_pt=G.FONT_HEADER,
+                               size_pt=G.FONT_CARD_HEADER,
                                color_hex=card.get("header_color", "172759"),
                                v_anchor="t", inset=G.INS_NONE, autofit="none")
-            cur_y += G.pt(28)
+            cur_y += G.pt(34)
 
         # Bullets
         for bullet in card.get("bullets", []):

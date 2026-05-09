@@ -442,3 +442,31 @@ def add_semantic_icon(slide, x: int, y: int, size_pt: float,
         _add_stroke_shape("ellipse", x, y, sz, sz)
 
     return shapes_added
+
+
+# ── Decorative background shape (Pattern 8) ──────────────────────────
+
+def add_decor_shape(slide, x: int, y: int, w: int, h: int,
+                    color_hex: str, alpha_percent: int = 8):
+    """
+    Large faint ellipse for visual depth (Pattern 8 — Kimi style).
+    alpha_percent: 5–15. Append BEFORE content shapes (z-order).
+    """
+    from pptx.util import Emu as _Emu
+    shape = slide.shapes.add_shape(9, _Emu(x), _Emu(y), _Emu(w), _Emu(h))
+    spPr = shape._element.spPr
+    alpha_emu = int(alpha_percent * 1000)
+    for tag in (qn("a:noFill"), qn("a:solidFill"), qn("a:gradFill")):
+        for el in spPr.findall(tag):
+            spPr.remove(el)
+    solidFill = etree.SubElement(spPr, qn("a:solidFill"))
+    srgb = etree.SubElement(solidFill, qn("a:srgbClr"), val=_hex_upper(color_hex))
+    etree.SubElement(srgb, qn("a:alpha"), val=str(alpha_emu))
+    ln = spPr.find(qn("a:ln"))
+    if ln is not None:
+        spPr.remove(ln)
+    etree.SubElement(spPr, qn("a:ln")).append(
+        etree.fromstring('<a:noFill xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>')
+    )
+    shape.text_frame.text = ""
+    return shape

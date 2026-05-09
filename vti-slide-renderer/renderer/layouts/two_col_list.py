@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pptx.util import Emu
 from .. import geometry as G
-from ..shapes import add_textbox_styled, add_badge, add_separator_line
+from ..shapes import add_textbox_styled, add_dot_bullet, add_separator_line
 from ..footer import inject_footer
 from ._common import add_slide_bg, add_accent_bar, add_slide_header
 
@@ -29,16 +29,21 @@ def render(prs, slide_data: dict):
 
     def draw_items(items, start_x):
         cy = G.CONTENT_TOP + G.pt(8)
+        row_h = G.pt(52)
         for item in items:
-            badge_color = item.get("badge_color", "2362B0")
-            add_badge(slide, start_x, cy, "•", badge_color, size_pt=8)
-            add_textbox_styled(slide, start_x + G.pt(14), cy,
-                               col_w - G.pt(16), G.pt(20),
+            dot_color = item.get("badge_color", "2362B0")
+            dot_size = 8
+            # Vertically centre the dot with the text line
+            add_dot_bullet(slide, start_x + G.pt(4),
+                           cy + G.pt(row_h // 2 // G.PT - dot_size // 2),
+                           dot_color, dot_size)
+            add_textbox_styled(slide, start_x + G.pt(18), cy,
+                               col_w - G.pt(20), row_h,
                                item.get("text", ""),
                                size_pt=G.FONT_BODY,
                                color_hex=item.get("text_color", "1C2D4F"),
-                               v_anchor="m", inset=G.INS_NONE, autofit="none", wrap=True)
-            cy += G.pt(24)
+                               v_anchor="m", inset=G.INS_NONE, autofit="norm", wrap=True)
+            cy += row_h + G.pt(4)
 
     draw_items(d.get("left_items", []), left_x)
     draw_items(d.get("right_items", []), right_x)

@@ -16,12 +16,21 @@ JSON này sẽ được đưa vào Python renderer để tạo file `.pptx`. **B
 
 # DESIGN SYSTEM — ĐỌC KỸ VÀ TUÂN THỦ TUYỆT ĐỐI
 
-## 1. KÍCH THƯỚC SLIDE
+## 1. KÍCH THƯỚC SLIDE & CONTENT ZONE BUDGET
 
 ```
-Slide: 960pt × 540pt (16:9 widescreen)
-Content zone: x=20pt → 940pt, y=105pt → 480pt
-Footer zone: y=502pt (không được để content chạm vào đây)
+Slide:          960pt × 540pt (16:9 widescreen)
+Margin X:       20pt (left & right)
+Content zone X: 20pt → 940pt  (width = 920pt)
+Content zone Y: 105pt → 480pt (height = 375pt)
+Footer zone:    y = 502pt  ← KHÔNG để content chạm vào đây
+
+Card sizing (Stretch-to-fill):
+  card_h = (375 - 10×(n_rows-1)) / n_rows
+    1 hàng  → 375pt  | 2 hàng → 182pt | 3 hàng → 118pt
+  card_w = (920 - 10×(n_cols-1)) / n_cols
+    2 cột → 455pt | 3 cột → 300pt | 4 cột → 222pt
+  Gap giữa cards: 10pt
 ```
 
 ---
@@ -183,7 +192,7 @@ Line spacing: Tiếng Việt = 1.4, Tiếng Nhật = 1.6
 
 ---
 
-## 6. SEMANTIC ICON TYPES
+## 6. SEMANTIC ICON TYPES & SIZE TIERS
 
 Chọn icon_type theo ngữ nghĩa nội dung — KHÔNG chọn theo màu:
 ```
@@ -200,6 +209,13 @@ Chọn icon_type theo ngữ nghĩa nội dung — KHÔNG chọn theo màu:
 "default"  → dùng khi không khớp với type nào trên
 ```
 **Icon stroke color = border_top color của card chứa icon** — luôn luôn, không exception.
+
+**Icon size tiers — BẮT BUỘC theo vị trí:**
+```
+size_pt = 80  → Cover right_card, Section Divider right_card  (Hero tier)
+size_pt = 48  → Layout F right_panel                          (Mid tier)
+size_pt = 36  → Layout A cards, Layout L cells                (Small tier)
+```
 
 ---
 
@@ -452,6 +468,13 @@ Tint xoay A→B→C→D theo step index.
 }
 ```
 
+**right_panel rules:**
+
+- `callout_number` = "" nếu không có stat nổi bật → render icon thuần
+- `callout_number` = "98%" / `callout_label` = "Accuracy" → render stat lớn thay icon
+- `icon.size_pt` phải là **48** cho Layout F (Mid tier)
+- `border_top` = icon stroke color = tint border của panel
+
 ### Layout G — Section Divider
 
 ```json
@@ -568,6 +591,7 @@ Tint xoay A→B→C→D theo step index.
 ```
 **Rule:** `cells.length` trong `[6, 8]`. `n_cols=3` → 6 cells (2×3); `n_cols=4` → 8 cells (2×4).
 Tint rotate A→B→C→D→E→F theo cell index.
+**KHÔNG dùng n_cols=2 cho Layout L** — minimum là 3.
 
 ### Layout M — Quote
 
@@ -606,12 +630,40 @@ Tint rotate A→B→C→D→E→F theo cell index.
 □ section_idx tăng đúng mỗi khi có Layout G
 □ Badge colors theo section_idx rotation (không hardcode cùng màu)
 □ Icon stroke = border_top của card chứa icon
+□ Icon size_pt: 80 (Cover/Section), 48 (Layout F), 36 (Layout A/L)
+□ Layout F: luôn có right_panel; left_panel dùng "body_text" (không phải "body")
+□ Layout D: dùng key "left_card" và "right_card" (không phải left_col/right_col)
+□ Layout L: n_cols ≥ 3; 6 cells → n_cols=3; 8 cells → n_cols=4
+□ Layout M: luôn có "quote_text" (không phải "quote"), và "accent_block_left"
+□ Layout J: dùng "left_items"/"right_items" với "section_title" và "slide_range"
 □ Slide title: tối đa 10 từ
 □ Bullets: tối đa 3 bullets/card, mỗi bullet ≤ 2 dòng
 □ Layout variety: không quá 3 slides liên tiếp cùng layout
 □ Slide đầu tiên (slide_number=1) phải là Layout I (Cover)
 □ Tất cả hex values: 6 ký tự, KHÔNG có dấu #
 □ Gradient angles: dùng đúng constants (9000000 / 5400000 / 16200000 / 0)
+```
+
+## Theme color mapping — khi theme ≠ VTI
+
+```
+Khi theme = "Dark":
+  slide bg.from → "1C1C2E"   | slide bg.to → "12121F"
+  title_color   → "E0E2E5"   | body_color  → "D8DAE0"
+  muted_color   → "8A8CA0"   | separator   → "3A3A5A"
+  card bg.from  → "252538"   | card bg.to  → "2E2E4A"
+  accent bar    → "D4A26A" → "8DAAC2"
+  Section G bg  → "1C1C2E" → "12121F"
+  CTA bg        → "12121F" → "1C1C2E"
+
+Khi theme = "Light":
+  slide bg.from → "F5F4F0"   | slide bg.to → "ECEAE4"
+  title_color   → "1A1A2E"   | body_color  → "2E2E3A"
+  muted_color   → "8A9BAD"   | separator   → "A3B5B8"
+  card bg.from  → "FFFFFF"   | card bg.to  → "F0EEE8"
+  accent bar    → "3B6FA0" → "C06030"
+  Section G bg  → "F5F4F0" → "ECEAE4"
+  CTA bg        → "ECEAE4" → "F5F4F0"
 ```
 
 ## Xử lý khi nội dung user vượt density limit
@@ -654,4 +706,42 @@ User đưa câu dài làm slide title → paraphrase thành ≤10 từ
 ❌ Slide đầu tiên không phải Layout I
 ❌ Giải thích JSON bằng văn bản — output chỉ là JSON thuần
 ❌ Dùng layout A cho tất cả slides (vi phạm variety rule)
+❌ Layout F dùng key "body" thay vì "left_panel.body_text"
+❌ Layout D dùng "left_col"/"right_col" thay vì "left_card"/"right_card"
+❌ Layout M dùng "quote" thay vì "quote_text"
+❌ Layout J dùng "items" thay vì "left_items"/"right_items"
+❌ Layout L: n_cols=2 (vi phạm minimum n_cols=3)
+❌ Icon size_pt sai tier: dùng 36 cho Cover/Section (phải là 80)
+```
+
+---
+
+## KẾ THỪA KIMI AI STYLE — NGUYÊN TẮC THIẾT KẾ CAO CẤP
+
+```
+1. Stretch-to-fill geometry: Cards luôn fill từ y=105pt → y=480pt.
+   Không hardcode height. Ít content → card to hơn, padding nhiều hơn.
+
+2. Tinted card system: Mỗi card trong VTI theme có màu nền riêng (tint A-F).
+   KHÔNG dùng card trắng đơn thuần. Mỗi tint có bg gradient + border_top + icon_stroke.
+
+3. Decor shapes: Cover, Section Divider, CTA đều có decor ellipse mờ (opacity 5-15%)
+   tạo visual depth. Python tự xử lý — bạn cứ điền đúng JSON.
+
+4. Section color rotation: Màu badge/stat xoay theo section_idx để tạo visual rhythm.
+   KHÔNG hardcode cùng màu xuyên suốt toàn deck.
+
+5. Layout intelligence: Phân tích content type, chọn layout phù hợp nhất.
+   1 deck nên dùng 4-6 layout khác nhau. Không dùng Layout A cho >40% slides.
+
+6. Content density cap: Tự paraphrase khi vượt limit — KHÔNG hỏi user.
+   Title ≤ 10 từ. Bullets ≤ 3/card. Steps ≤ 5. Events ≤ 5.
+
+7. Font hierarchy:
+   Cover title: 64-72pt | Section title: 50-54pt | Slide title: 32-36pt
+   Card header: 20-24pt | Body/bullet: 14-16pt (floor 14) | Badge: 16-18pt
+   Stat number: 56-64pt | CTA heading: 28-32pt
+
+8. Icon semantic binding: icon_stroke LUÔN = border_top của card chứa nó.
+   Không hardcode icon color độc lập với card tint.
 ```

@@ -7,8 +7,9 @@ from pptx.oxml.ns import qn
 
 from .. import geometry as G
 from ..shapes import (
-    add_textbox_styled, add_semantic_icon,
-    _set_gradient_fill_on_spPr, _set_solid_fill_on_spPr
+    add_textbox_styled, add_semantic_icon, add_rounded_rect,
+    _set_gradient_fill_on_spPr, _set_solid_fill_on_spPr,
+    add_decor_shape,
 )
 from ..footer import inject_footer
 from ._common import remove_line
@@ -58,20 +59,24 @@ def render(prs, slide_data: dict):
     remove_line(spPr)
     dec_shape.text_frame.text = ""
 
-    # ── Right card ───────────────────────────────────────────────────
+    # ── Right card (tinted roundRect + top border + hero icon) ──────
     rc = d.get("right_card", {})
-    card_w = G.pt(220)
-    card_h = G.pt(340)
+    card_w = G.pt(240)
+    card_h = G.pt(360)
     card_x = G.SLIDE_W - card_w - G.pt(40)
     card_y = (G.SLIDE_H - card_h) // 2
     rc_bg = rc.get("bg", {"from": "EBF4FC", "to": "D6EAF8"})
-    rc_shape = slide.shapes.add_shape(
-        1, Emu(card_x), Emu(card_y), Emu(card_w), Emu(card_h)
-    )
-    rc_spPr = rc_shape._element.spPr
-    _set_gradient_fill_on_spPr(rc_spPr, rc_bg["from"], rc_bg["to"], 16200000)
-    remove_line(rc_spPr)
-    rc_shape.text_frame.text = ""
+    add_rounded_rect(slide, card_x, card_y, card_w, card_h,
+                     rc_bg["from"], rc_bg["to"],
+                     angle_emu=rc_bg.get("angle", 16200000),
+                     border_hex=rc.get("border_top"),
+                     border_w_pt=4)
+
+    # Decor ellipse (Pattern 8) inside card
+    add_decor_shape(slide,
+                    card_x + G.pt(100), card_y + G.pt(220),
+                    G.pt(180), G.pt(180),
+                    rc.get("border_top", "4A9EE0"), alpha_percent=7)
 
     icon_def = rc.get("icon", {})
     if icon_def:
@@ -92,18 +97,19 @@ def render(prs, slide_data: dict):
                            d["section_number"], bold=True, size_pt=22,
                            color_hex=d.get("section_number_color", "6A7FA0"),
                            v_anchor="m", inset=G.INS_NONE, autofit="none")
-        cy += G.pt(34)
+        cy += G.pt(36)
 
     if d.get("section_title"):
-        add_textbox_styled(slide, tx, cy, text_w, G.pt(60),
-                           d["section_title"], bold=True, size_pt=32,
+        add_textbox_styled(slide, tx, cy, text_w, G.pt(70),
+                           d["section_title"], bold=True,
+                           size_pt=G.FONT_SECTION_TITLE,
                            color_hex=d.get("section_title_color", "FFFFFF"),
                            v_anchor="t", inset=G.INS_NONE, autofit="norm", wrap=True)
-        cy += G.pt(70)
+        cy += G.pt(80)
 
     if d.get("subtitle"):
-        add_textbox_styled(slide, tx, cy, text_w, G.pt(30),
-                           d["subtitle"], size_pt=G.FONT_COVER_SUB,
+        add_textbox_styled(slide, tx, cy, text_w, G.pt(36),
+                           d["subtitle"], size_pt=G.FONT_BODY,
                            color_hex=d.get("subtitle_color", "B8D0EE"),
                            v_anchor="m", inset=G.INS_NONE, autofit="none", wrap=True)
 

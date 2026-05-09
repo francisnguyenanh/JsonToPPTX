@@ -60,14 +60,19 @@ INS_HEADER = dict(lIns=pt(12), rIns=pt(12), tIns=pt(6),  bIns=pt(6))
 INS_FOOTER = dict(lIns=pt(6),  rIns=pt(6),  tIns=0,      bIns=0)
 INS_NONE   = dict(lIns=0,      rIns=0,      tIns=0,      bIns=0)
 
-# ── Typography — standard sizes (pt) ──────────────────────────────────
-FONT_TITLE      = 28
-FONT_HEADER     = 14
-FONT_BODY       = 10
-FONT_SMALL      = 9
-FONT_BADGE      = 11
-FONT_COVER_TITLE = 36
-FONT_COVER_SUB  = 14
+# ── Typography — standard sizes (pt) — aligned with VTI design system ─
+FONT_SECTION_TITLE = 52   # Layout G section title (range 50–54)
+FONT_TITLE         = 34   # slide title (range 32–36)
+FONT_CARD_HEADER   = 22   # card/step header (range 20–24)
+FONT_HEADER        = 22   # alias for FONT_CARD_HEADER
+FONT_BODY          = 15   # body/bullet text (range 14–16, floor 14)
+FONT_SMALL         = 13   # breadcrumb/small text (range 12–14)
+FONT_BADGE         = 17   # badge number text (range 16–18)
+FONT_STAT_BIG      = 60   # large KPI / stat number (range 56–64)
+FONT_STAT_LABEL    = 15   # stat label below number (range 14–16)
+FONT_CTA_HEADING   = 30   # CTA/Next Steps heading (range 28–32)
+FONT_COVER_TITLE   = 68   # cover main title (range 64–72)
+FONT_COVER_SUB     = 26   # cover subtitle (range 24–28)
 
 # ── Standard font ────────────────────────────────────────────────────
 FONT_NAME = "Arial"

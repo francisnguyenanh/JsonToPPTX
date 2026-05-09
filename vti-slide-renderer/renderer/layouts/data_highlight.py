@@ -37,16 +37,16 @@ def render(prs, slide_data: dict):
         num_y = sy + G.pt(20)
         label_y = sy + stats_h - G.pt(40)
 
-        add_textbox_styled(slide, inner_x, num_y, inner_w, G.pt(60),
+        add_textbox_styled(slide, inner_x, num_y, inner_w, G.pt(80),
                            stat.get("number", "") + stat.get("unit", ""),
-                           bold=True, size_pt=36,
+                           bold=True, size_pt=G.FONT_STAT_BIG,
                            color_hex=stat.get("number_color", "2362B0"),
                            align="center", v_anchor="m",
-                           inset=G.INS_NONE, autofit="none")
+                           inset=G.INS_NONE, autofit="norm")
 
         add_textbox_styled(slide, inner_x, label_y, inner_w, G.pt(30),
                            stat.get("label", ""),
-                           size_pt=G.FONT_BODY,
+                           size_pt=G.FONT_STAT_LABEL,
                            color_hex=stat.get("label_color", "6A7FA0"),
                            align="center", v_anchor="m",
                            inset=G.INS_NONE, autofit="none")

@@ -1,4 +1,4 @@
-# layouts/quote.py — Layout M
+# layouts/quote.py — Layout M (Quote / Key Message)
 from __future__ import annotations
 
 from pptx.util import Emu
@@ -7,11 +7,11 @@ from pptx.oxml.ns import qn
 
 from .. import geometry as G
 from ..shapes import (
-    add_textbox_styled, add_separator_line,
-    _set_gradient_fill_on_spPr, _set_solid_fill_on_spPr
+    add_textbox_styled, add_rounded_rect,
+    _set_gradient_fill_on_spPr, _set_solid_fill_on_spPr,
 )
 from ..footer import inject_footer
-from ._common import add_slide_bg, add_accent_bar, remove_line
+from ._common import add_slide_bg, add_accent_bar, add_slide_header, remove_line
 
 
 def render(prs, slide_data: dict):
@@ -22,35 +22,85 @@ def render(prs, slide_data: dict):
 
     add_slide_bg(slide, d.get("bg", {"from": "FFFFFF", "to": "EEF4FB"}))
     add_accent_bar(slide, d.get("accent_bar", {"from": "2362B0", "to": "7FC236"}))
+    add_slide_header(slide, d.get("title", ""), d.get("breadcrumb", ""),
+                     title_color=d.get("title_color", "172759"),
+                     breadcrumb_color=d.get("breadcrumb_color", "6A7FA0"))
 
-    # Decorative large quote mark
-    quote_color = d.get("quote_mark_color", "EEF4FB")
-    add_textbox_styled(slide, G.CONTENT_X, G.CONTENT_TOP - G.pt(20),
-                       G.pt(80), G.pt(80), "\u201c",
-                       size_pt=120, color_hex=quote_color,
-                       bold=True, v_anchor="t", inset=G.INS_NONE, autofit="none")
+    # ── Left accent block (16pt wide gradient bar) ───────────────────
+    alb = d.get("accent_block_left", {"from": "2362B0", "to": "7FC236"})
+    bar_w = G.pt(14)
+    accent_block = slide.shapes.add_shape(
+        1, Emu(G.CONTENT_X), Emu(G.CONTENT_TOP),
+        Emu(bar_w), Emu(G.CONTENT_H - G.pt(65))
+    )
+    _set_gradient_fill_on_spPr(accent_block._element.spPr,
+                                alb["from"], alb["to"], alb.get("angle", 0))
+    remove_line(accent_block._element.spPr)
+    accent_block.text_frame.text = ""
 
-    # Quote text
-    add_textbox_styled(slide,
-                       G.CONTENT_X + G.pt(40), G.CONTENT_TOP + G.pt(30),
-                       G.CONTENT_W - G.pt(80),
-                       G.CONTENT_H - G.pt(60),
-                       d.get("quote", ""),
-                       size_pt=20, bold=True,
-                       color_hex=d.get("quote_color", "172759"),
-                       align="center", v_anchor="m",
-                       inset=G.INS_CARD, autofit="norm", wrap=True,
-                       line_spacing=1.4)
+    # ── Decorative large quote mark (background, Pattern 8 style) ────
+    qmark_color = d.get("quote_mark_color", "2362B0")
+    # Render as faint large text shape (not Pattern 8 ellipse)
+    add_textbox_styled(
+        slide,
+        G.CONTENT_X + bar_w, G.CONTENT_TOP - G.pt(15),
+        G.pt(90), G.pt(90), "“",
+        size_pt=110, color_hex=qmark_color,
+        bold=True, v_anchor="t", inset=G.INS_NONE, autofit="none"
+    )
+
+    # ── Quote text zone ──────────────────────────────────────────────
+    quote_x = G.CONTENT_X + bar_w + G.pt(40)
+    quote_w = G.CONTENT_W - bar_w - G.pt(50)
+    quote_top = G.CONTENT_TOP + G.pt(28)
+    context_h = G.pt(58)
+    quote_h = G.CONTENT_H - G.pt(65) - context_h - G.pt(8)
+
+    # quote_text is the primary key; fall back to legacy "quote"
+    quote_text = d.get("quote_text", d.get("quote", ""))
+    add_textbox_styled(
+        slide,
+        quote_x, quote_top, quote_w, quote_h,
+        quote_text,
+        size_pt=20, bold=False, italic=True,
+        color_hex=d.get("quote_color", "172759"),
+        align="left", v_anchor="m",
+        inset=G.INS_CARD, autofit="norm", wrap=True,
+        line_spacing=1.5
+    )
 
     # Attribution
     if d.get("attribution"):
-        add_textbox_styled(slide,
-                           G.CONTENT_X, G.CONTENT_BOTTOM - G.pt(30),
-                           G.CONTENT_W, G.pt(24),
-                           "— " + d["attribution"],
-                           size_pt=G.FONT_BODY,
-                           color_hex=d.get("attribution_color", "6A7FA0"),
-                           align="right", v_anchor="m",
-                           inset=G.INS_NONE, autofit="none")
+        attr_y = G.CONTENT_TOP + G.CONTENT_H - G.pt(65) - G.pt(26)
+        attr_text = d["attribution"]
+        if not attr_text.startswith("—"):
+            attr_text = "— " + attr_text
+        add_textbox_styled(
+            slide,
+            quote_x, attr_y, quote_w, G.pt(24),
+            attr_text,
+            size_pt=G.FONT_BODY,
+            color_hex=d.get("attribution_color", "6A7FA0"),
+            align="right", v_anchor="m",
+            inset=G.INS_NONE, autofit="none"
+        )
+
+    # ── Context card (bottom strip) ──────────────────────────────────
+    ctx_text = d.get("context_text", "")
+    if ctx_text:
+        ctx_y = G.CONTENT_TOP + G.CONTENT_H - context_h
+        ctx_bg = d.get("context_bg", {"from": "EEF4FB", "to": "FFFFFF"})
+        add_rounded_rect(slide, G.CONTENT_X, ctx_y, G.CONTENT_W, context_h,
+                         ctx_bg["from"], ctx_bg["to"],
+                         angle_emu=ctx_bg.get("angle", 16200000))
+        add_textbox_styled(
+            slide,
+            G.CONTENT_X + G.pt(12), ctx_y,
+            G.CONTENT_W - G.pt(24), context_h,
+            ctx_text,
+            size_pt=G.FONT_BODY,
+            color_hex=d.get("context_text_color", "1C2D4F"),
+            v_anchor="m", inset=G.INS_NONE, autofit="none", wrap=True
+        )
 
     inject_footer(slide, sn)

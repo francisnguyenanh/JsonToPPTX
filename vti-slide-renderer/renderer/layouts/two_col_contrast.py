@@ -19,8 +19,10 @@ def render(prs, slide_data: dict):
     add_slide_header(slide, d.get("title", ""), d.get("breadcrumb", ""))
 
     col_w = G.card_w(2)
-    for col_idx, col_key in enumerate(("left_col", "right_col")):
-        col = d.get(col_key, {})
+    # Support both new key names (left_card/right_card) and legacy (left_col/right_col)
+    for col_idx, (new_key, old_key) in enumerate(
+            (("left_card", "left_col"), ("right_card", "right_col"))):
+        col = d.get(new_key) or d.get(old_key, {})
         cx = G.card_x(col_idx, 2)
         cy = G.CONTENT_TOP
         ch = G.CONTENT_H
@@ -34,12 +36,12 @@ def render(prs, slide_data: dict):
         cur_y = cy + G.pt(12)
 
         if col.get("header"):
-            add_textbox_styled(slide, inner_x, cur_y, inner_w, G.pt(24),
+            add_textbox_styled(slide, inner_x, cur_y, inner_w, G.pt(30),
                                col["header"], bold=True,
-                               size_pt=G.FONT_HEADER,
+                               size_pt=G.FONT_CARD_HEADER,
                                color_hex=col.get("header_color", "172759"),
                                v_anchor="t", inset=G.INS_NONE, autofit="none")
-            cur_y += G.pt(28)
+            cur_y += G.pt(36)
 
         for bullet in col.get("bullets", []):
             add_dot_bullet(slide, inner_x, cur_y + G.pt(4),
