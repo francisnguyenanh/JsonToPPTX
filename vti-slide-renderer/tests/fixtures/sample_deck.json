@@ -1,0 +1,152 @@
+{
+  "deck_meta": {
+    "theme": "VTI",
+    "lang": "vi",
+    "title": "VTI Japan 2026 Sample Deck"
+  },
+  "slides": [
+    {
+      "slide_number": 1,
+      "layout": "I",
+      "section_idx": 0,
+      "design": {
+        "tag": "VTI JAPAN 2026",
+        "title": "Chuyển đổi số tại VTI",
+        "subtitle": "Hành trình đổi mới sáng tạo cùng công nghệ AI",
+        "caption": "Tháng 5 năm 2026",
+        "bg": { "from": "FFFFFF", "to": "EEF4FB", "angle": 9000000 },
+        "left_bar": { "from": "172759", "to": "2362B0" },
+        "right_strip": { "from": "2362B0", "to": "4A9EE0", "opacity": 30 },
+        "title_color": "172759",
+        "tag_color": "2362B0",
+        "subtitle_color": "172759",
+        "caption_color": "6A7FA0",
+        "divider_bar": { "from": "2362B0", "to": "7FC236" },
+        "right_card": {
+          "tint": "A",
+          "icon": { "type": "ai", "stroke": "4A9EE0", "size_pt": 80 }
+        }
+      }
+    },
+    {
+      "slide_number": 2,
+      "layout": "G",
+      "section_idx": 1,
+      "design": {
+        "bg": { "from": "172759", "to": "1A3070", "angle": 9000000 },
+        "left_bar": { "from": "2362B0", "to": "7FC236" },
+        "section_number": "01",
+        "section_number_color": "6A7FA0",
+        "section_title": "Tổng quan chiến lược",
+        "section_title_color": "FFFFFF",
+        "subtitle": "Định hướng phát triển và mục tiêu trọng tâm",
+        "subtitle_color": "B8D0EE",
+        "right_card": {
+          "tint": "A",
+          "bg": { "from": "EBF4FC", "to": "D6EAF8" },
+          "icon": { "type": "settings", "stroke": "4A9EE0", "size_pt": 64 }
+        },
+        "decor": { "color": "1A3070", "opacity": 20 }
+      }
+    },
+    {
+      "slide_number": 3,
+      "layout": "A",
+      "section_idx": 1,
+      "design": {
+        "title": "Ba trụ cột chuyển đổi số",
+        "breadcrumb": "01 / Tổng quan chiến lược",
+        "accent_bar": { "from": "2362B0", "to": "7FC236", "angle": 5400000 },
+        "bg": { "from": "FFFFFF", "to": "EEF4FB", "angle": 9000000 },
+        "n_cols": 3,
+        "cards": [
+          {
+            "tint": "A",
+            "header": "Công nghệ AI",
+            "header_color": "172759",
+            "bg": { "from": "EBF4FC", "to": "D6EAF8" },
+            "border_top": "4A9EE0",
+            "icon": { "type": "ai", "stroke": "4A9EE0", "size_pt": 36 },
+            "bullets": [
+              { "text": "Tích hợp mô hình ngôn ngữ lớn vào quy trình làm việc", "dot_color": "4A9EE0" },
+              { "text": "Tự động hóa báo cáo và phân tích dữ liệu", "dot_color": "4A9EE0" },
+              { "text": "Hỗ trợ ra quyết định thông minh theo thời gian thực", "dot_color": "4A9EE0" }
+            ],
+            "text_color": "1C2D4F"
+          },
+          {
+            "tint": "B",
+            "header": "Hạ tầng đám mây",
+            "header_color": "172759",
+            "bg": { "from": "EBFCF4", "to": "D6F5E8" },
+            "border_top": "1E9E8A",
+            "icon": { "type": "data", "stroke": "1E9E8A", "size_pt": 36 },
+            "bullets": [
+              { "text": "Kiến trúc microservice cloud-native", "dot_color": "1E9E8A" },
+              { "text": "Triển khai đa vùng với độ trễ thấp", "dot_color": "1E9E8A" },
+              { "text": "Bảo mật zero-trust và mã hóa đầu cuối", "dot_color": "1E9E8A" }
+            ],
+            "text_color": "1C2D4F"
+          },
+          {
+            "tint": "C",
+            "header": "Con người & Văn hóa",
+            "header_color": "172759",
+            "bg": { "from": "FFF7EB", "to": "FFEDD6" },
+            "border_top": "E07B20",
+            "icon": { "type": "team", "stroke": "E07B20", "size_pt": 36 },
+            "bullets": [
+              { "text": "Chương trình đào tạo kỹ năng số toàn diện", "dot_color": "E07B20" },
+              { "text": "Xây dựng văn hóa đổi mới liên tục", "dot_color": "E07B20" },
+              { "text": "Kết nối chuyên gia Việt Nam và Nhật Bản", "dot_color": "E07B20" }
+            ],
+            "text_color": "1C2D4F"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 4,
+      "layout": "E",
+      "section_idx": 1,
+      "design": {
+        "title": "Kết quả nổi bật năm 2025",
+        "breadcrumb": "01 / Tổng quan chiến lược",
+        "accent_bar": { "from": "2362B0", "to": "7FC236", "angle": 5400000 },
+        "bg": { "from": "FFFFFF", "to": "EEF4FB", "angle": 9000000 },
+        "stats": [
+          {
+            "tint": "A",
+            "bg": { "from": "EBF4FC", "to": "D6EAF8" },
+            "number": "98",
+            "unit": "%",
+            "number_color": "2362B0",
+            "label": "Tỷ lệ hoàn thành dự án đúng hạn",
+            "label_color": "6A7FA0"
+          },
+          {
+            "tint": "B",
+            "bg": { "from": "EBFCF4", "to": "D6F5E8" },
+            "number": "2.4x",
+            "unit": "",
+            "number_color": "1E9E8A",
+            "label": "Tăng trưởng năng suất nhờ AI",
+            "label_color": "6A7FA0"
+          },
+          {
+            "tint": "C",
+            "bg": { "from": "FFF7EB", "to": "FFEDD6" },
+            "number": "450+",
+            "unit": "",
+            "number_color": "E07B20",
+            "label": "Kỹ sư đã hoàn thành khóa học AI",
+            "label_color": "6A7FA0"
+          }
+        ],
+        "context_text": "VTI đã đạt được những cột mốc quan trọng trong hành trình chuyển đổi số, vượt mục tiêu đề ra cho năm tài chính 2025.",
+        "context_bg": { "from": "EEF4FB", "to": "FFFFFF" },
+        "context_text_color": "1C2D4F"
+      }
+    }
+  ]
+}

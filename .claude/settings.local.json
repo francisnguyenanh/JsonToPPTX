@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\4. DEV\\\\GitHub\\(Onlyone\\)\\\\JsonToPPTX\" -Recurse -File)",
+      "Bash(Select-Object FullName)"
+    ]
+  }
+}
