@@ -1,4 +1,4 @@
-# shapes.py  ECore shape builders using python-pptx + lxml OOXML injection
+# shapes.py — Core shape builders using python-pptx + lxml OOXML injection
 from __future__ import annotations
 
 from lxml import etree
@@ -88,18 +88,18 @@ def add_rounded_rect(slide, x: int, y: int, w: int, h: int,
                      angle_emu: int = 16200000,
                      border_hex: str = None, border_w_pt: float = 0):
     """
-    Add roundRect shape (adj=16667 ≁Ecorner radius 13%).
+    Add roundRect shape (adj=20000, ~16% corner radius).
     Optional top border as separate thin rect if border_hex provided.
     Returns the shape object.
     """
     from pptx.util import Emu as _Emu
     shape = slide.shapes.add_shape(
-        1,  # MSO_SHAPE_TYPE.ROUNDED_RECTANGLE = freeform; use preset
+        1,
         _Emu(x), _Emu(y), _Emu(w), _Emu(h)
     )
 
-    # Set preset geometry to roundRect
-    spPr = shape._element.spPr  # noqa
+    # Set preset geometry to roundRect with a slightly more rounded corner
+    spPr = shape._element.spPr
     prstGeom = spPr.find(qn("a:prstGeom"))
     if prstGeom is not None:
         prstGeom.set("prst", "roundRect")
@@ -109,7 +109,7 @@ def add_rounded_rect(slide, x: int, y: int, w: int, h: int,
         else:
             for gd in avLst.findall(qn("a:gd")):
                 avLst.remove(gd)
-        etree.SubElement(avLst, qn("a:gd"), name="adj", fmla="val 16667")
+        etree.SubElement(avLst, qn("a:gd"), name="adj", fmla="val 20000")
 
     # Remove line (border)
     ln = spPr.find(qn("a:ln"))
@@ -283,7 +283,6 @@ def add_dot_bullet(slide, x: int, y: int, dot_hex: str, size_pt: float = 6):
     etree.SubElement(spPr, qn("a:ln")).append(
         etree.fromstring('<a:noFill xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>')
     )
-    # Remove text frame content
     shape.text_frame.text = ""
     return shape
 
@@ -306,142 +305,159 @@ def add_separator_line(slide, x: int, y: int, w: int, h: int, color_hex: str):
     return shape
 
 
-# ── Semantic icon (OOXML primitives only) ─────────────────────────────
+# ── Semantic icon (filled OOXML presets + glow background) ────────────
 
 def add_semantic_icon(slide, x: int, y: int, size_pt: float,
                       stroke_hex: str, icon_type: str):
     """
-    OOXML geometric icon  Estroke-only, no bitmap, no PIL, no base64.
+    Professional icon: semi-transparent glow circle + filled preset shape symbol.
+    No bitmaps, no PIL — pure OOXML geometry.
     Returns list of shapes added.
     """
     from pptx.util import Emu as _Emu
 
     sz = G.pt(size_pt)
-    stroke_w_emu = G.pt(2.0) if size_pt >= 80 else G.pt(1.5)
-    shapes_added = []
+    result = []
+    _NOFILL = '<a:noFill xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>'
 
-    def _add_stroke_shape(preset, sx, sy, sw, sh, rx=None, ry=None, rw=None, rh=None):
-        """Add stroke-only shape at absolute coords."""
-        s = slide.shapes.add_shape(1, _Emu(sx), _Emu(sy), _Emu(sw), _Emu(sh))
+    def _prep(s, preset):
         spPr = s._element.spPr
         pg = spPr.find(qn("a:prstGeom"))
         if pg is not None:
             pg.set("prst", preset)
-            avLst = pg.find(qn("a:avLst"))
-            if avLst is None:
-                avLst = etree.SubElement(pg, qn("a:avLst"))
-
-        # No fill
+            av = pg.find(qn("a:avLst"))
+            if av is None:
+                etree.SubElement(pg, qn("a:avLst"))
+            else:
+                for gd in av.findall(qn("a:gd")):
+                    av.remove(gd)
         for tag in (qn("a:noFill"), qn("a:solidFill"), qn("a:gradFill")):
             for el in spPr.findall(tag):
                 spPr.remove(el)
-        etree.SubElement(spPr, qn("a:noFill"))
+        old_ln = spPr.find(qn("a:ln"))
+        if old_ln is not None:
+            spPr.remove(old_ln)
+        return spPr
 
-        # Stroke
-        ln = spPr.find(qn("a:ln"))
-        if ln is not None:
-            spPr.remove(ln)
-        ln_el = etree.SubElement(spPr, qn("a:ln"), w=str(stroke_w_emu))
-        solidFill = etree.SubElement(ln_el, qn("a:solidFill"))
-        etree.SubElement(solidFill, qn("a:srgbClr"), val=_hex_upper(stroke_hex))
-
+    def filled(preset, sx, sy, sw, sh, fill_hex, alpha=None):
+        s = slide.shapes.add_shape(1, _Emu(sx), _Emu(sy), _Emu(sw), _Emu(sh))
+        spPr = _prep(s, preset)
+        sf = etree.SubElement(spPr, qn("a:solidFill"))
+        srgb = etree.SubElement(sf, qn("a:srgbClr"), val=_hex_upper(fill_hex))
+        if alpha is not None:
+            etree.SubElement(srgb, qn("a:alpha"), val=str(alpha))
+        ln = etree.SubElement(spPr, qn("a:ln"))
+        etree.SubElement(ln, qn("a:noFill"))
         s.text_frame.text = ""
-        shapes_added.append(s)
+        result.append(s)
         return s
 
-    cx, cy = x + sz // 8, y + sz // 8
-    inner = sz * 3 // 4
+    def stroked(preset, sx, sy, sw, sh, color_hex, w_pt=2.5):
+        s = slide.shapes.add_shape(1, _Emu(sx), _Emu(sy), _Emu(sw), _Emu(sh))
+        spPr = _prep(s, preset)
+        etree.SubElement(spPr, qn("a:noFill"))
+        ln = etree.SubElement(spPr, qn("a:ln"), w=str(G.pt(w_pt)))
+        sf = etree.SubElement(ln, qn("a:solidFill"))
+        etree.SubElement(sf, qn("a:srgbClr"), val=_hex_upper(color_hex))
+        s.text_frame.text = ""
+        result.append(s)
+        return s
+
+    # Background glow circle (semi-transparent)
+    filled("ellipse", x, y, sz, sz, stroke_hex, alpha=18000)
+
+    # Inner icon zone with padding
+    pad = sz // 5
+    ix, iy, isz = x + pad, y + pad, sz - 2 * pad
 
     if icon_type == "ai":
-        # Outer circle
-        _add_stroke_shape("ellipse", x, y, sz, sz)
-        # Inner circle
-        off = sz // 4
-        _add_stroke_shape("ellipse", x + off, y + off, sz // 2, sz // 2)
-        # Dot at center (solid)
-        dot_sz = G.pt(4) if size_pt >= 80 else G.pt(3)
-        dot = slide.shapes.add_shape(9, _Emu(x + sz // 2 - dot_sz // 2),
-                                     _Emu(y + sz // 2 - dot_sz // 2),
-                                     _Emu(dot_sz), _Emu(dot_sz))
-        d_spPr = dot._element.spPr
-        _set_solid_fill_on_spPr(d_spPr, stroke_hex)
-        d_ln = d_spPr.find(qn("a:ln"))
-        if d_ln is not None:
-            d_spPr.remove(d_ln)
-        etree.SubElement(d_spPr, qn("a:ln")).append(
-            etree.fromstring('<a:noFill xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>')
-        )
-        dot.text_frame.text = ""
-        shapes_added.append(dot)
-
-    elif icon_type == "settings":
-        # Outer circle
-        _add_stroke_shape("ellipse", x, y, sz, sz)
-        # Inner gear-like ring
-        off = sz // 5
-        _add_stroke_shape("ellipse", x + off, y + off, sz - 2 * off, sz - 2 * off)
+        # Hexagon (tech/AI feel) + white cut-out center
+        filled("hexagon", ix, iy, isz, isz, stroke_hex)
+        q = isz // 3
+        filled("ellipse", ix + q, iy + q, isz - 2 * q, isz - 2 * q, "FFFFFF")
 
     elif icon_type == "data":
-        # Bar chart: 3 vertical bars
-        bar_w = sz // 5
-        heights = [sz // 2, sz * 3 // 4, sz // 3]
-        for i, bh in enumerate(heights):
-            bx = x + i * (bar_w + G.pt(2))
-            by = y + sz - bh
-            _add_stroke_shape("rect", bx, by, bar_w, bh)
+        # Filled bar chart — 3 bars at varied heights
+        bw = max((isz - G.pt(4)) // 3, G.pt(6))
+        for i, hf in enumerate([0.55, 0.88, 0.40]):
+            bh = max(int(isz * hf), G.pt(4))
+            bx = ix + i * (bw + G.pt(2))
+            by = iy + isz - bh
+            filled("rect", bx, by, bw, bh, stroke_hex)
+
+    elif icon_type == "settings":
+        # 12-point star (gear-like) + white center
+        filled("star12", ix, iy, isz, isz, stroke_hex)
+        q = isz // 3
+        filled("ellipse", ix + q, iy + q, isz - 2 * q, isz - 2 * q, "FFFFFF")
 
     elif icon_type == "flow":
-        # Rounded rect
-        _add_stroke_shape("roundRect", x + G.pt(4), y + sz // 3, sz - G.pt(8), sz // 3)
-        # Arrow line (as thin rect)
-        _add_stroke_shape("rect", x + sz // 2, y + sz // 6, G.pt(1), sz * 2 // 3)
+        # Filled right-arrow
+        ah = max(isz * 3 // 5, G.pt(8))
+        filled("rightArrow", ix, iy + (isz - ah) // 2, isz, ah, stroke_hex)
 
     elif icon_type == "doc":
-        # Document shape
-        _add_stroke_shape("rect", x + G.pt(4), y, sz - G.pt(8), sz)
-        # Lines inside
-        off = sz // 5
-        _add_stroke_shape("rect", x + G.pt(8), y + off * 2, sz - G.pt(16), G.pt(1))
-        _add_stroke_shape("rect", x + G.pt(8), y + off * 3, sz - G.pt(16), G.pt(1))
+        # Rounded document + 3 white horizontal lines
+        filled("roundRect", ix, iy, isz, isz, stroke_hex)
+        lh = max(int(G.pt(1.5)), 1)
+        lx = ix + isz // 6
+        lw = isz * 2 // 3
+        for j in range(3):
+            ly = iy + isz // 5 + j * (isz // 5)
+            filled("rect", lx, ly, lw, lh, "FFFFFF")
 
     elif icon_type == "team":
-        # Two circles (people)
-        head_sz = sz // 3
-        _add_stroke_shape("ellipse", x + sz // 8, y, head_sz, head_sz)
-        _add_stroke_shape("ellipse", x + sz // 2, y, head_sz, head_sz)
-        # Bodies
-        _add_stroke_shape("roundRect", x, y + head_sz + G.pt(2), sz // 2, sz // 2)
-        _add_stroke_shape("roundRect", x + sz // 2, y + head_sz + G.pt(2), sz // 2, sz // 2)
+        # Two person silhouettes
+        hs = isz * 2 // 5
+        bh = max(isz - hs - G.pt(3), G.pt(4))
+        filled("ellipse", ix, iy, hs, hs, stroke_hex)
+        filled("roundRect", ix - G.pt(2), iy + hs + G.pt(3), hs + G.pt(4), bh, stroke_hex)
+        p2x = ix + isz - hs
+        filled("ellipse", p2x, iy, hs, hs, stroke_hex)
+        filled("roundRect", p2x - G.pt(2), iy + hs + G.pt(3), hs + G.pt(4), bh, stroke_hex)
 
     elif icon_type == "check":
-        # Circle with checkmark (two lines as rects)
-        _add_stroke_shape("ellipse", x, y, sz, sz)
-        # Check tick (approximate with small rect diagonal)
-        _add_stroke_shape("rect", x + sz // 4, y + sz // 2, sz // 4, G.pt(1.5))
-        _add_stroke_shape("rect", x + sz // 3, y + sz // 3, G.pt(1.5), sz // 2)
+        # Filled circle + white checkmark lines
+        filled("ellipse", ix, iy, isz, isz, stroke_hex)
+        lh = max(int(G.pt(2)), 1)
+        filled("rect", ix + isz // 5, iy + isz * 3 // 5, isz // 4, lh, "FFFFFF")
+        filled("rect", ix + isz * 2 // 5, iy + isz // 3, lh, isz // 3, "FFFFFF")
 
     elif icon_type == "chart":
-        # Line chart (two line segments)
-        _add_stroke_shape("ellipse", x, y + sz // 2, sz, G.pt(1.5))
-        _add_stroke_shape("rect", x + G.pt(2), y + sz // 4, sz // 2, sz // 4)
-        _add_stroke_shape("rect", x + sz // 2, y + sz // 8, sz // 3, sz // 4)
+        # Rounded background + white bar chart
+        filled("roundRect", ix, iy, isz, isz, stroke_hex)
+        bw = max(isz // 7, G.pt(4))
+        for j, hf in enumerate([0.40, 0.72, 0.55, 0.88]):
+            bh = int(isz * hf)
+            bx = ix + G.pt(3) + j * (bw + G.pt(2))
+            by = iy + isz - bh - G.pt(3)
+            if bx + bw <= ix + isz - G.pt(2):
+                filled("rect", bx, by, bw, bh, "FFFFFF")
 
     elif icon_type == "lock":
-        # Lock body
-        _add_stroke_shape("roundRect", x + sz // 6, y + sz // 3, sz * 2 // 3, sz * 2 // 3)
-        # Shackle (arc as ellipse top half)
-        _add_stroke_shape("ellipse", x + sz // 4, y, sz // 2, sz // 2)
+        # Lock body + stroked shackle arc
+        body_h = isz * 2 // 3
+        filled("roundRect", ix, iy + isz - body_h, isz, body_h, stroke_hex)
+        shw = isz * 5 // 8
+        stroked("ellipse", ix + (isz - shw) // 2, iy, shw, isz * 2 // 3, stroke_hex, 2.5)
 
     elif icon_type == "star":
-        # Pentagon approximation  Ejust ellipse + inner ellipse
-        _add_stroke_shape("ellipse", x, y, sz, sz)
-        off = sz // 4
-        _add_stroke_shape("ellipse", x + off, y + off, sz // 2, sz // 2)
+        filled("star5", ix, iy, isz, isz, stroke_hex)
 
-    else:  # default  Esingle ellipse
-        _add_stroke_shape("ellipse", x, y, sz, sz)
+    elif icon_type == "lightning":
+        filled("lightningBolt", ix, iy, isz, isz, stroke_hex)
 
-    return shapes_added
+    elif icon_type == "arrow_up":
+        filled("upArrow", ix, iy, isz, isz, stroke_hex)
+
+    elif icon_type == "pentagon":
+        filled("pentagon", ix, iy, isz, isz, stroke_hex)
+
+    else:
+        # default — filled diamond
+        filled("diamond", ix, iy, isz, isz, stroke_hex)
+
+    return result
 
 
 # ── Decorative background shape (Pattern 8) ──────────────────────────
@@ -449,8 +465,8 @@ def add_semantic_icon(slide, x: int, y: int, size_pt: float,
 def add_decor_shape(slide, x: int, y: int, w: int, h: int,
                     color_hex: str, alpha_percent: int = 8):
     """
-    Large faint ellipse for visual depth (Pattern 8 — Kimi style).
-    alpha_percent: 5–15. Append BEFORE content shapes (z-order).
+    Large faint ellipse for visual depth (Pattern 8).
+    alpha_percent: 5-15. Append BEFORE content shapes (z-order).
     """
     from pptx.util import Emu as _Emu
     shape = slide.shapes.add_shape(9, _Emu(x), _Emu(y), _Emu(w), _Emu(h))

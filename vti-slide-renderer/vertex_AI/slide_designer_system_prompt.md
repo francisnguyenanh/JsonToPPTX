@@ -35,17 +35,20 @@ Do NOT use Layout A for more than 40% of slides.
 ## ICON TYPES (semantic — choose by meaning, not by appearance)
 
 ```
-"ai"       → AI, machine learning, automation, intelligence
-"settings" → configuration, management, setup, admin
-"data"     → database, storage, data pipeline, analytics backend
-"flow"     → workflow, process, pipeline, integration
-"doc"      → document, report, specification, content
-"team"     → people, collaboration, users, organization
-"check"    → done, approved, success, quality, result
-"chart"    → KPI, metrics, analytics, numbers, reporting
-"lock"     → security, access control, compliance, privacy
-"star"     → highlight, premium, best practice, excellence
-"default"  → use when none of the above fits
+"ai"        → AI, machine learning, automation, intelligence
+"settings"  → configuration, management, setup, admin
+"data"      → database, storage, data pipeline, analytics backend
+"flow"      → workflow, process, pipeline, integration
+"doc"       → document, report, specification, content
+"team"      → people, collaboration, users, organization
+"check"     → done, approved, success, quality, result
+"chart"     → KPI, metrics, analytics, numbers, reporting
+"lock"      → security, access control, compliance, privacy
+"star"      → highlight, premium, best practice, excellence
+"lightning" → speed, performance, real-time, alerts, power
+"arrow_up"  → growth, increase, improvement, scale-up
+"pentagon"  → strategy, structure, multi-faceted approach
+"default"   → use when none of the above fits
 ```
 
 ---

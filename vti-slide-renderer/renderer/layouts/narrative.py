@@ -23,9 +23,9 @@ def render(prs, slide_data: dict):
                      title_color=d.get("title_color", "172759"),
                      breadcrumb_color=d.get("breadcrumb_color", "6A7FA0"))
 
-    # Zone split: 55% left panel, 5% gap, 40% right panel
-    right_w = G.pt(360)
-    gap = G.pt(12)
+    # Zone split: 57% left panel, 5% gap, 38% right panel
+    right_w = G.pt(340)
+    gap = G.pt(16)
     left_w = G.CONTENT_W - right_w - gap
 
     left_x = G.CONTENT_X
@@ -33,32 +33,36 @@ def render(prs, slide_data: dict):
 
     # ── Left panel: body text + optional bullets ──────────────────────
     left_panel = d.get("left_panel", {})
-    # Backward compat: old format used "body" at top level
     body_text = left_panel.get("body_text", d.get("body", ""))
     text_color = left_panel.get("text_color", d.get("text_color", "1C2D4F"))
 
     cur_y = G.CONTENT_TOP
+    bullets = left_panel.get("bullets", [])
 
     if body_text:
-        body_h = G.pt(160) if left_panel.get("bullets") else G.CONTENT_H
+        # Reserve space for bullets: 32pt per bullet + 8pt gap before first bullet
+        bullet_reserve = len(bullets) * G.pt(32) + (G.pt(12) if bullets else 0)
+        body_h = max(G.CONTENT_H - bullet_reserve, G.pt(80))
         add_textbox_styled(
             slide, left_x, cur_y, left_w, body_h,
             body_text,
             size_pt=G.FONT_BODY, color_hex=text_color,
-            v_anchor="t", inset=G.INS_CARD, autofit="norm", wrap=True,
-            line_spacing=1.4
+            v_anchor="t", inset=G.INS_CARD,
+            autofit="norm", wrap=True,
+            line_spacing=1.5
         )
-        cur_y += body_h + G.pt(8)
+        cur_y += body_h + G.pt(10)
 
-    for bullet in left_panel.get("bullets", []):
-        add_dot_bullet(slide, left_x + G.pt(4), cur_y + G.pt(5),
+    for bullet in bullets:
+        add_dot_bullet(slide, left_x + G.pt(4), cur_y + G.pt(6),
                        bullet.get("dot_color", "4A9EE0"), 6)
-        add_textbox_styled(slide, left_x + G.pt(16), cur_y,
-                           left_w - G.pt(16), G.pt(20),
+        add_textbox_styled(slide, left_x + G.pt(18), cur_y,
+                           left_w - G.pt(18), G.pt(28),
                            bullet.get("text", ""),
                            size_pt=G.FONT_BODY, color_hex=text_color,
-                           v_anchor="t", inset=G.INS_NONE, autofit="none", wrap=True)
-        cur_y += G.pt(22)
+                           v_anchor="t", inset=G.INS_NONE,
+                           autofit="norm", wrap=True)
+        cur_y += G.pt(32)
 
     # ── Right panel: tinted card + icon + optional callout ────────────
     right_panel = d.get("right_panel", {})
@@ -75,7 +79,6 @@ def render(prs, slide_data: dict):
         callout_label = right_panel.get("callout_label", "")
 
         if callout_number:
-            # Stat callout mode: big number centred
             add_textbox_styled(
                 slide,
                 right_x + G.pt(8), G.CONTENT_TOP + G.pt(60),
@@ -93,10 +96,10 @@ def render(prs, slide_data: dict):
                     callout_label,
                     size_pt=G.FONT_STAT_LABEL,
                     color_hex="6A7FA0",
-                    align="center", v_anchor="m", inset=G.INS_NONE, autofit="none"
+                    align="center", v_anchor="m", inset=G.INS_NONE, autofit="norm"
                 )
         elif icon_def:
-            icon_sz = icon_def.get("size_pt", 48)
+            icon_sz = icon_def.get("size_pt", 56)
             icon_x = right_x + (right_w - G.pt(icon_sz)) // 2
             icon_y = G.CONTENT_TOP + (G.CONTENT_H - G.pt(icon_sz)) // 2
             add_semantic_icon(slide, icon_x, icon_y, icon_sz,

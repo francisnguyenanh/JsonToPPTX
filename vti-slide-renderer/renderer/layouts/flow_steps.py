@@ -51,12 +51,12 @@ def render(prs, slide_data: dict):
             cur_y += G.pt(20)
 
             if step.get("header"):
-                add_textbox_styled(slide, inner_x, cur_y, inner_w, G.pt(24),
+                add_textbox_styled(slide, inner_x, cur_y, inner_w, G.pt(44),
                                    step["header"], bold=True,
                                    size_pt=G.FONT_HEADER,
                                    color_hex=step.get("header_color", "172759"),
-                                   v_anchor="t", inset=G.INS_NONE, autofit="none", wrap=True)
-                cur_y += G.pt(28)
+                                   v_anchor="t", inset=G.INS_NONE, autofit="norm", wrap=True)
+                cur_y += G.pt(48)
 
             if step.get("description"):
                 add_textbox_styled(slide, inner_x, cur_y, inner_w,
@@ -83,10 +83,10 @@ def render(prs, slide_data: dict):
 
             if step.get("header"):
                 add_textbox_styled(slide, inner_x + G.pt(20), cur_y,
-                                   G.CONTENT_W - G.pt(40), G.pt(22),
+                                   G.CONTENT_W - G.pt(40), G.pt(30),
                                    step["header"], bold=True,
                                    size_pt=G.FONT_HEADER,
                                    color_hex=step.get("header_color", "172759"),
-                                   v_anchor="m", inset=G.INS_NONE, autofit="none")
+                                   v_anchor="m", inset=G.INS_NONE, autofit="norm", wrap=True)
 
     inject_footer(slide, sn)

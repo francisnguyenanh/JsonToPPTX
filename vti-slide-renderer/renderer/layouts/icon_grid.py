@@ -64,7 +64,7 @@ def render(prs, slide_data: dict):
                                size_pt=G.FONT_CARD_HEADER,
                                color_hex=cell.get("label_color", "172759"),
                                align="center", v_anchor="m",
-                               inset=G.INS_NONE, autofit="none")
+                               inset=G.INS_NONE, autofit="norm", wrap=True)
             cur_y += label_h
 
         if has_sub:
@@ -72,6 +72,6 @@ def render(prs, slide_data: dict):
                                cell["sub_label"], size_pt=G.FONT_SMALL,
                                color_hex=cell.get("sub_label_color", "6A7FA0"),
                                align="center", v_anchor="t",
-                               inset=G.INS_NONE, autofit="none", wrap=True)
+                               inset=G.INS_NONE, autofit="norm", wrap=True)
 
     inject_footer(slide, sn)

@@ -16,6 +16,7 @@
       --blue-hi:   #4A9EE0;
       --green:     #5DBE5D;
       --red:       #E05060;
+      --amber:     #F5A623;
       --text:      #D6EAF8;
       --muted:     #6A7FA0;
       --radius:    8px;
@@ -58,15 +59,122 @@
       gap: 0;
     }
 
-    /* ── Editor panel ── */
+    /* ── Left panel ── */
     .editor-panel {
       display: flex;
       flex-direction: column;
-      padding: 24px;
-      gap: 12px;
       border-right: 1px solid var(--border);
     }
 
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 13px 16px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      color: var(--blue-hi);
+      border-bottom-color: var(--blue-hi);
+      background: rgba(74, 158, 224, 0.07);
+    }
+    .tab-icon { font-size: 15px; }
+
+    /* ── Tab content ── */
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      padding: 24px;
+      gap: 14px;
+    }
+    .tab-content.active { display: flex; }
+
+    /* ── AI Tab ── */
+    .ai-description {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+    }
+    .ai-description strong { color: var(--amber); }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .form-group.grow { flex: 1; }
+
+    label.field-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    select.field-select {
+      padding: 8px 10px;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+      min-width: 120px;
+    }
+    select.field-select:focus { border-color: var(--blue-hi); }
+
+    #ai-request {
+      flex: 1;
+      min-height: 300px;
+      padding: 14px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.7;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #ai-request:focus { border-color: var(--amber); }
+
+    .ai-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ── JSON Tab ── */
     .panel-label {
       font-size: 11px;
       font-weight: 600;
@@ -89,7 +197,7 @@
 
     #json-input {
       flex: 1;
-      min-height: 420px;
+      min-height: 380px;
       padding: 14px;
       font-family: 'Consolas', 'Courier New', monospace;
       font-size: 13px;
@@ -130,6 +238,8 @@
     .btn:disabled { opacity: 0.45; cursor: not-allowed; }
     .btn-primary  { background: var(--blue);    color: #fff; }
     .btn-primary:not(:disabled):hover  { background: var(--blue-hi); }
+    .btn-ai       { background: #6B35BD; color: #fff; }
+    .btn-ai:not(:disabled):hover       { background: #8B55DD; }
     .btn-ghost    { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
     .btn-ghost:not(:disabled):hover    { background: var(--border); }
     .btn-success  { background: var(--green);   color: #0a1a0a; }
@@ -153,6 +263,20 @@
       margin-bottom: 10px;
     }
 
+    /* Mode indicator */
+    .mode-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .mode-badge.mode-ai   { background: rgba(107,53,189,0.2); color: #B794F4; border: 1px solid #6B35BD; }
+    .mode-badge.mode-json { background: rgba(35,98,176,0.2);  color: var(--blue-hi); border: 1px solid var(--blue); }
+
     /* Status card */
     .status-card {
       background: var(--bg);
@@ -172,7 +296,7 @@
       flex-shrink: 0;
     }
     .dot-idle    { background: var(--muted); }
-    .dot-loading { background: #F5A623; animation: pulse 0.8s infinite alternate; }
+    .dot-loading { background: var(--amber); animation: pulse 0.8s infinite alternate; }
     .dot-ok      { background: var(--green); }
     .dot-err     { background: var(--red); }
     @keyframes pulse { to { opacity: 0.3; } }
@@ -245,6 +369,24 @@
     .field-required { color: var(--red); }
     .field-optional { color: var(--green); }
 
+    /* AI hint */
+    .ai-hint {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .ai-hint code {
+      color: #B794F4;
+      background: rgba(107,53,189,0.15);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: 'Consolas', monospace;
+    }
+
     /* Spinner */
     .spinner {
       display: inline-block;
@@ -295,23 +437,89 @@
   <div class="logo">VTI</div>
   <div class="header-text">
     <h1>VTI Slide Renderer</h1>
-    <p>Chuyển đổi JSON → PowerPoint (.pptx)</p>
+    <p>Tạo PowerPoint từ AI hoặc JSON</p>
   </div>
 </header>
 
 <main>
-  <!-- Left: JSON editor -->
+  <!-- Left: tabs -->
   <section class="editor-panel">
-    <div class="panel-label">
-      JSON Input
-      <span class="badge" id="json-badge">–</span>
+
+    <!-- Tab buttons -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-ai-btn" onclick="switchTab('ai')">
+        <span class="tab-icon">✦</span> Vertex AI Tạo Slide
+      </button>
+      <button class="tab-btn" id="tab-json-btn" onclick="switchTab('json')">
+        <span class="tab-icon">{ }</span> JSON → PPTX
+      </button>
     </div>
 
-    <textarea
-      id="json-input"
-      placeholder='{
+    <!-- Tab 1: AI Generate -->
+    <div class="tab-content active" id="tab-ai">
+
+      <div class="ai-description">
+        Nhập <strong>dàn ý hoặc yêu cầu</strong> bằng ngôn ngữ tự nhiên.
+        Vertex AI (Gemini) sẽ thiết kế toàn bộ nội dung slide và xuất file PPTX.
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="field-label" for="ai-theme">Theme</label>
+          <select class="field-select" id="ai-theme">
+            <option value="VTI" selected>VTI (Mặc định)</option>
+            <option value="Dark">Dark</option>
+            <option value="Light">Light</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="field-label" for="ai-lang">Ngôn ngữ</label>
+          <select class="field-select" id="ai-lang">
+            <option value="vi" selected>Tiếng Việt</option>
+            <option value="en">English</option>
+            <option value="ja">日本語 (Japanese)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group grow" style="flex:1; display:flex; flex-direction:column; gap:5px;">
+        <label class="field-label" for="ai-request">Dàn ý / Yêu cầu</label>
+        <textarea
+          id="ai-request"
+          placeholder="Ví dụ:
+Tạo bài thuyết trình giới thiệu sản phẩm phần mềm quản lý nhà hàng gồm 8 slide:
+- Slide bìa: tên sản phẩm, tagline
+- Vấn đề hiện tại của ngành F&B
+- Giải pháp của chúng tôi
+- Tính năng chính (4 tính năng, dạng icon grid)
+- Demo / giao diện
+- Khách hàng tiêu biểu
+- Gói dịch vụ & giá
+- Call to action liên hệ"
+        ></textarea>
+      </div>
+
+      <div class="ai-footer">
+        <button class="btn btn-ai" id="ai-btn" onclick="doGenerate()">
+          <span id="ai-icon">✦</span> Tạo Slide với AI
+        </button>
+        <button class="btn btn-ghost" onclick="clearAI()">Xoá</button>
+      </div>
+    </div>
+
+    <!-- Tab 2: JSON Render -->
+    <div class="tab-content" id="tab-json">
+
+      <div class="panel-label">
+        JSON Input
+        <span class="badge" id="json-badge">–</span>
+      </div>
+
+      <textarea
+        id="json-input"
+        placeholder='{
   "deck_meta": {
-    "theme": "vti_blue",
+    "theme": "VTI",
     "lang": "vi",
     "title": "Tên bài trình bày"
   },
@@ -324,20 +532,27 @@
     }
   ]
 }'
-    ></textarea>
+      ></textarea>
 
-    <div class="editor-footer">
-      <button class="btn btn-primary" id="render-btn" onclick="doRender()">
-        <span id="render-icon">&#9654;</span> Render PPTX
-      </button>
-      <button class="btn btn-ghost" onclick="clearInput()">Xoá</button>
-      <button class="btn btn-ghost" onclick="loadSample()">Mẫu JSON</button>
-      <span class="char-count" id="char-count">0 ký tự</span>
+      <div class="editor-footer">
+        <button class="btn btn-primary" id="render-btn" onclick="doRender()">
+          <span id="render-icon">&#9654;</span> Render PPTX
+        </button>
+        <button class="btn btn-ghost" onclick="clearJSON()">Xoá</button>
+        <button class="btn btn-ghost" onclick="loadSample()">Mẫu JSON</button>
+        <span class="char-count" id="char-count">0 ký tự</span>
+      </div>
     </div>
+
   </section>
 
   <!-- Right: status & download -->
   <aside class="side-panel">
+
+    <!-- Mode indicator -->
+    <div>
+      <div id="mode-badge" class="mode-badge mode-ai">✦ Chế độ: Vertex AI</div>
+    </div>
 
     <!-- Status -->
     <div>
@@ -345,7 +560,7 @@
       <div class="status-card">
         <div class="status-row">
           <div class="status-dot dot-idle" id="status-dot"></div>
-          <span id="status-text">Chờ JSON…</span>
+          <span id="status-text">Sẵn sàng…</span>
         </div>
       </div>
     </div>
@@ -368,8 +583,19 @@
     <!-- Error -->
     <div id="error-box"></div>
 
-    <!-- Schema hint -->
-    <div>
+    <!-- Contextual hints -->
+    <div id="hint-ai">
+      <div class="section-title">Gợi ý AI</div>
+      <div class="ai-hint">
+        <strong style="color:var(--text)">Theme:</strong><br>
+        <code>VTI</code> Xanh dương doanh nghiệp<br>
+        <code>Dark</code> Tối hiện đại<br>
+        <code>Light</code> Sáng tối giản<br><br>
+        <strong style="color:var(--text)">Mẹo:</strong> Mô tả càng chi tiết số slide, bố cục, nội dung từng slide, AI sẽ tạo chính xác hơn.
+      </div>
+    </div>
+
+    <div id="hint-json" style="display:none">
       <div class="section-title">Cấu trúc JSON</div>
       <div class="schema-hint">
         <strong>Bắt buộc:</strong><br>
@@ -390,7 +616,7 @@
 <script>
   const SAMPLE = {
     "deck_meta": {
-      "theme": "vti_blue",
+      "theme": "VTI",
       "lang": "vi",
       "title": "Giới thiệu sản phẩm VTI"
     },
@@ -418,38 +644,75 @@
 
   document.getElementById('sample-preview').textContent = JSON.stringify(SAMPLE, null, 2);
 
-  let _blobUrl = null;
+  // ── State ──
+  let _blobUrl  = null;
   let _filename = 'presentation.pptx';
+  let _activeTab = 'ai';
 
-  const inputEl   = document.getElementById('json-input');
-  const badgeEl   = document.getElementById('json-badge');
-  const dotEl     = document.getElementById('status-dot');
-  const statusEl  = document.getElementById('status-text');
-  const renderBtn = document.getElementById('render-btn');
-  const iconEl    = document.getElementById('render-icon');
-  const dlArea    = document.getElementById('download-area');
-  const errorBox  = document.getElementById('error-box');
-  const charCount = document.getElementById('char-count');
+  // ── DOM refs ──
+  const jsonInput  = document.getElementById('json-input');
+  const badgeEl    = document.getElementById('json-badge');
+  const dotEl      = document.getElementById('status-dot');
+  const statusEl   = document.getElementById('status-text');
+  const renderBtn  = document.getElementById('render-btn');
+  const renderIcon = document.getElementById('render-icon');
+  const aiBtn      = document.getElementById('ai-btn');
+  const aiIcon     = document.getElementById('ai-icon');
+  const dlArea     = document.getElementById('download-area');
+  const errorBox   = document.getElementById('error-box');
+  const charCount  = document.getElementById('char-count');
 
-  inputEl.addEventListener('input', onInput);
+  jsonInput.addEventListener('input', onJSONInput);
 
-  function onInput() {
-    const val = inputEl.value.trim();
+  // ── Tab switching ──
+  function switchTab(tab) {
+    _activeTab = tab;
+    document.getElementById('tab-ai').classList.toggle('active', tab === 'ai');
+    document.getElementById('tab-json').classList.toggle('active', tab === 'json');
+    document.getElementById('tab-ai-btn').classList.toggle('active', tab === 'ai');
+    document.getElementById('tab-json-btn').classList.toggle('active', tab === 'json');
+
+    const modeBadge = document.getElementById('mode-badge');
+    const hintAI    = document.getElementById('hint-ai');
+    const hintJSON  = document.getElementById('hint-json');
+
+    if (tab === 'ai') {
+      modeBadge.className = 'mode-badge mode-ai';
+      modeBadge.textContent = '✦ Chế độ: Vertex AI';
+      hintAI.style.display   = '';
+      hintJSON.style.display = 'none';
+      setStatus('idle', 'Sẵn sàng…');
+    } else {
+      modeBadge.className = 'mode-badge mode-json';
+      modeBadge.textContent = '{ } Chế độ: JSON';
+      hintAI.style.display   = 'none';
+      hintJSON.style.display = '';
+      setStatus('idle', 'Chờ JSON…');
+    }
+
+    hideError();
+    dlArea.classList.remove('visible');
+    if (_blobUrl) { URL.revokeObjectURL(_blobUrl); _blobUrl = null; }
+  }
+
+  // ── JSON validation ──
+  function onJSONInput() {
+    const val = jsonInput.value.trim();
     charCount.textContent = val.length + ' ký tự';
     if (!val) {
-      inputEl.className = '';
+      jsonInput.className = '';
       badgeEl.textContent = '–';
       return;
     }
     try {
       JSON.parse(val);
-      inputEl.classList.remove('invalid');
-      inputEl.classList.add('valid');
+      jsonInput.classList.remove('invalid');
+      jsonInput.classList.add('valid');
       badgeEl.textContent = 'Hợp lệ ✓';
       badgeEl.style.color = 'var(--green)';
     } catch {
-      inputEl.classList.remove('valid');
-      inputEl.classList.add('invalid');
+      jsonInput.classList.remove('valid');
+      jsonInput.classList.add('invalid');
       badgeEl.textContent = 'Lỗi JSON';
       badgeEl.style.color = 'var(--red)';
     }
@@ -460,9 +723,17 @@
     statusEl.textContent = msg;
   }
 
-  function clearInput() {
-    inputEl.value = '';
-    inputEl.className = '';
+  function clearAI() {
+    document.getElementById('ai-request').value = '';
+    hideError();
+    dlArea.classList.remove('visible');
+    setStatus('idle', 'Sẵn sàng…');
+    if (_blobUrl) { URL.revokeObjectURL(_blobUrl); _blobUrl = null; }
+  }
+
+  function clearJSON() {
+    jsonInput.value = '';
+    jsonInput.className = '';
     badgeEl.textContent = '–';
     badgeEl.style.color = '';
     charCount.textContent = '0 ký tự';
@@ -473,9 +744,9 @@
   }
 
   function loadSample() {
-    inputEl.value = JSON.stringify(SAMPLE, null, 2);
-    onInput();
-    inputEl.focus();
+    jsonInput.value = JSON.stringify(SAMPLE, null, 2);
+    onJSONInput();
+    jsonInput.focus();
   }
 
   function showError(msg) {
@@ -488,11 +759,14 @@
     errorBox.classList.remove('visible');
   }
 
-  function setLoading(on) {
+  function setLoadingAI(on) {
+    aiBtn.disabled = on;
+    aiIcon.innerHTML = on ? '<span class="spinner"></span>' : '✦';
+  }
+
+  function setLoadingRender(on) {
     renderBtn.disabled = on;
-    iconEl.innerHTML = on
-      ? '<span class="spinner"></span>'
-      : '&#9654;';
+    renderIcon.innerHTML = on ? '<span class="spinner"></span>' : '&#9654;';
   }
 
   function triggerDownload() {
@@ -503,11 +777,76 @@
     a.click();
   }
 
+  async function handlePPTXResponse(resp) {
+    if (!resp.ok) {
+      let detail;
+      try {
+        const j = await resp.json();
+        detail = JSON.stringify(j, null, 2);
+      } catch {
+        detail = await resp.text();
+      }
+      showError('Lỗi từ server (HTTP ' + resp.status + '):\n' + detail);
+      setStatus('err', 'Thất bại');
+      return false;
+    }
+
+    const blob = await resp.blob();
+    const cd   = resp.headers.get('Content-Disposition') || '';
+    const m    = cd.match(/filename="(.+?)"/);
+    _filename  = m ? m[1] : 'presentation.pptx';
+
+    if (_blobUrl) URL.revokeObjectURL(_blobUrl);
+    _blobUrl = URL.createObjectURL(blob);
+
+    document.getElementById('dl-name').textContent = _filename;
+    document.getElementById('dl-size').textContent =
+      'Kích thước: ' + (blob.size / 1024).toFixed(1) + ' KB';
+
+    dlArea.classList.add('visible');
+    setStatus('ok', 'Thành công ✓');
+    triggerDownload();
+    return true;
+  }
+
+  // ── Mode 1: Vertex AI Generate ──
+  async function doGenerate() {
+    hideError();
+    dlArea.classList.remove('visible');
+
+    const request = document.getElementById('ai-request').value.trim();
+    if (!request) {
+      showError('Vui lòng nhập dàn ý hoặc yêu cầu trước khi tạo slide.');
+      return;
+    }
+
+    const theme = document.getElementById('ai-theme').value;
+    const lang  = document.getElementById('ai-lang').value;
+
+    setLoadingAI(true);
+    setStatus('loading', 'Vertex AI đang thiết kế slide…');
+
+    try {
+      const resp = await fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request, theme, lang })
+      });
+      await handlePPTXResponse(resp);
+    } catch (e) {
+      showError('Lỗi mạng:\n' + e.message);
+      setStatus('err', 'Lỗi kết nối');
+    } finally {
+      setLoadingAI(false);
+    }
+  }
+
+  // ── Mode 2: JSON Render ──
   async function doRender() {
     hideError();
     dlArea.classList.remove('visible');
 
-    const raw = inputEl.value.trim();
+    const raw = jsonInput.value.trim();
     if (!raw) {
       showError('Vui lòng nhập JSON trước khi render.');
       return;
@@ -522,7 +861,7 @@
       return;
     }
 
-    setLoading(true);
+    setLoadingRender(true);
     setStatus('loading', 'Đang render…');
 
     try {
@@ -531,43 +870,12 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-
-      if (!resp.ok) {
-        let detail;
-        try {
-          const j = await resp.json();
-          detail = JSON.stringify(j, null, 2);
-        } catch {
-          detail = await resp.text();
-        }
-        showError('Lỗi từ server (HTTP ' + resp.status + '):\n' + detail);
-        setStatus('err', 'Render thất bại');
-        return;
-      }
-
-      const blob = await resp.blob();
-      const cd   = resp.headers.get('Content-Disposition') || '';
-      const m    = cd.match(/filename="(.+?)"/);
-      _filename  = m ? m[1] : 'presentation.pptx';
-
-      if (_blobUrl) URL.revokeObjectURL(_blobUrl);
-      _blobUrl = URL.createObjectURL(blob);
-
-      document.getElementById('dl-name').textContent = _filename;
-      document.getElementById('dl-size').textContent =
-        'Kích thước: ' + (blob.size / 1024).toFixed(1) + ' KB';
-
-      dlArea.classList.add('visible');
-      setStatus('ok', 'Render thành công ✓');
-
-      // Auto-download
-      triggerDownload();
-
+      await handlePPTXResponse(resp);
     } catch (e) {
       showError('Lỗi mạng:\n' + e.message);
       setStatus('err', 'Lỗi kết nối');
     } finally {
-      setLoading(false);
+      setLoadingRender(false);
     }
   }
 </script>

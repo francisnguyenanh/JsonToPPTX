@@ -51,7 +51,7 @@ def add_accent_bar(slide, bar: dict):
 def add_slide_header(slide, title: str, breadcrumb: str = "",
                      title_color: str = "172759",
                      breadcrumb_color: str = "6A7FA0"):
-    """Breadcrumb (y=18pt) then slide title (y=40pt) — spec order."""
+    """Breadcrumb (y=18pt) then slide title (y=38pt) — normAutofit prevents overflow."""
     if breadcrumb:
         add_textbox_styled(
             slide,
@@ -59,7 +59,7 @@ def add_slide_header(slide, title: str, breadcrumb: str = "",
             G.CONTENT_W, G.pt(20),
             breadcrumb,
             size_pt=G.FONT_SMALL, color_hex=breadcrumb_color,
-            v_anchor="m", inset=G.INS_NONE, autofit="none"
+            v_anchor="m", inset=G.INS_NONE, autofit="norm"
         )
     add_textbox_styled(
         slide,
@@ -68,5 +68,5 @@ def add_slide_header(slide, title: str, breadcrumb: str = "",
         title,
         bold=True, size_pt=G.FONT_TITLE,
         color_hex=title_color,
-        v_anchor="m", inset=G.INS_NONE, autofit="none"
+        v_anchor="t", inset=G.INS_NONE, autofit="norm", wrap=True
     )

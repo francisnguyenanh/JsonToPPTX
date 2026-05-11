@@ -6,7 +6,11 @@
       "Bash(Get-ChildItem -Recurse \"c:\\\\4. DEV\\\\GitHub\\(Onlyone\\)\\\\JsonToPPTX\")",
       "Bash(Select-Object FullName, Length)",
       "Bash(Sort-Object FullName)",
-      "Bash(.venv/Scripts/python -m pytest tests/ -v)"
+      "Bash(.venv/Scripts/python -m pytest tests/ -v)",
+      "Bash(Get-ChildItem -Path \"c:\\\\4. DEV\\\\GitHub\\(Onlyone\\)\\\\JsonToPPTX\" -Recurse -Force)",
+      "Bash(Select-Object -Property FullName)",
+      "Bash(python -c \"from renderer import engine; print\\('OK'\\)\")",
+      "Bash(python -c ' *)"
     ]
   }
 }
