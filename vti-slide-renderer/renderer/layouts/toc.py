@@ -37,20 +37,20 @@ def render(prs, slide_data: dict):
                            G.pt(2), G.CONTENT_H, sep_color)
 
         def _draw_col(items, start_x, start_idx):
-            row_h = G.pt(60)
+            row_h = G.pt(80)
             for i, item in enumerate(items):
                 iy = G.CONTENT_TOP + i * row_h
                 badge_color = item.get("badge_color", "2362B0")
                 badge_num = str(start_idx + i + 1)
-                add_badge(slide, start_x, iy + G.pt(8), badge_num, badge_color, size_pt=16)
+                add_badge(slide, start_x, iy + G.pt(11), badge_num, badge_color, size_pt=21)
 
-                text_x = start_x + G.pt(22)
-                text_w = col_w - G.pt(24)
+                text_x = start_x + G.pt(29)
+                text_w = col_w - G.pt(32)
 
                 # Section title
                 title_color = item.get("title_color", "172759")
                 add_textbox_styled(
-                    slide, text_x, iy + G.pt(6), text_w, G.pt(28),
+                    slide, text_x, iy + G.pt(8), text_w, G.pt(37),
                     item.get("section_title", item.get("label", "")),
                     bold=True, size_pt=G.FONT_CARD_HEADER,
                     color_hex=title_color,
@@ -62,7 +62,7 @@ def render(prs, slide_data: dict):
                 if slide_range:
                     range_color = item.get("range_color", item.get("sub_color", "6A7FA0"))
                     add_textbox_styled(
-                        slide, text_x, iy + G.pt(34), text_w, G.pt(20),
+                        slide, text_x, iy + G.pt(45), text_w, G.pt(27),
                         slide_range,
                         size_pt=G.FONT_SMALL, color_hex=range_color,
                         v_anchor="t", inset=G.INS_NONE, autofit="none"
@@ -82,13 +82,13 @@ def render(prs, slide_data: dict):
             col = i % cols
             row = i // cols
             ix = G.card_x(col, cols)
-            iy = G.CONTENT_TOP + row * G.pt(44)
+            iy = G.CONTENT_TOP + row * G.pt(59)
 
             badge_color = item.get("badge_color", "2362B0")
-            add_badge(slide, ix, iy, str(i + 1), badge_color, size_pt=16)
+            add_badge(slide, ix, iy, str(i + 1), badge_color, size_pt=21)
 
             add_textbox_styled(
-                slide, ix + G.pt(22), iy, col_w - G.pt(24), G.pt(30),
+                slide, ix + G.pt(29), iy, col_w - G.pt(32), G.pt(40),
                 item.get("label", ""), bold=True, size_pt=G.FONT_CARD_HEADER,
                 color_hex=item.get("text_color", "172759"),
                 v_anchor="m", inset=G.INS_NONE, autofit="none"
@@ -96,8 +96,8 @@ def render(prs, slide_data: dict):
 
             if item.get("description"):
                 add_textbox_styled(
-                    slide, ix + G.pt(22), iy + G.pt(22),
-                    col_w - G.pt(24), G.pt(18),
+                    slide, ix + G.pt(29), iy + G.pt(29),
+                    col_w - G.pt(32), G.pt(24),
                     item["description"], size_pt=G.FONT_SMALL,
                     color_hex=item.get("sub_color", "6A7FA0"),
                     v_anchor="t", inset=G.INS_NONE, autofit="none"

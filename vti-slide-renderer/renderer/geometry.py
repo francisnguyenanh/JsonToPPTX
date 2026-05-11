@@ -1,9 +1,10 @@
 # geometry.py — Single source of truth for all EMU coordinates
+# Canvas: 1280×720pt (Kimi AI standard, 16:9)
 # No other module may hardcode EMU values; use pt() or constants from here.
 
 # ── Slide dimensions ──────────────────────────────────────────────────
-SLIDE_W = 12192000   # 960pt × 12700
-SLIDE_H = 6858000    # 540pt × 12700
+SLIDE_W = 16256000   # 1280pt × 12700
+SLIDE_H = 9144000    # 720pt × 12700
 PT      = 12700      # 1pt in EMU
 
 
@@ -13,17 +14,17 @@ def pt(n: float) -> int:
 
 
 # ── Content Zone Budget ───────────────────────────────────────────────
-MARGIN_X        = pt(20)
-CONTENT_X       = pt(20)
-CONTENT_W       = pt(920)   # SLIDE_W - 2 × MARGIN_X
-ACCENT_BAR_Y    = pt(85)
-ACCENT_BAR_H    = pt(4)
-CONTENT_TOP     = pt(105)
-CONTENT_BOTTOM  = pt(480)
-CONTENT_H       = pt(375)   # CONTENT_BOTTOM - CONTENT_TOP
-FOOTER_Y        = pt(502)
-CARD_GAP        = pt(10)
-COL_GAP         = pt(10)
+MARGIN_X        = pt(27)
+CONTENT_X       = pt(27)
+CONTENT_W       = pt(1226)  # SLIDE_W - 2 × MARGIN_X
+ACCENT_BAR_Y    = pt(113)
+ACCENT_BAR_H    = pt(5)
+CONTENT_TOP     = pt(140)
+CONTENT_BOTTOM  = pt(640)
+CONTENT_H       = pt(500)   # CONTENT_BOTTOM - CONTENT_TOP
+FOOTER_Y        = pt(669)
+CARD_GAP        = pt(13)
+COL_GAP         = pt(13)
 
 # ── Stretch-to-fill formulas ──────────────────────────────────────────
 
@@ -45,34 +46,34 @@ def card_x(col_idx: int, n_cols: int) -> int:
 
 
 # ── Footer fixed positions ────────────────────────────────────────────
-FOOTER_NUM_X    = 453839
-FOOTER_NUM_Y    = 6375400
-FOOTER_NUM_W    = 533400
-FOOTER_NUM_H    = 438551
-FOOTER_COPY_X   = 1066800
-FOOTER_COPY_Y   = 6413000
-FOOTER_COPY_W   = 3175000
-FOOTER_COPY_H   = 342900
+FOOTER_NUM_X    = 605119
+FOOTER_NUM_Y    = 8500533
+FOOTER_NUM_W    = 711200
+FOOTER_NUM_H    = 584735
+FOOTER_COPY_X   = 1422400
+FOOTER_COPY_Y   = 8550667
+FOOTER_COPY_W   = 4233333
+FOOTER_COPY_H   = 457200
 
 # ── bodyPr inset constants ────────────────────────────────────────────
-INS_CARD   = dict(lIns=pt(12), rIns=pt(12), tIns=pt(9),  bIns=pt(9))
-INS_HEADER = dict(lIns=pt(12), rIns=pt(12), tIns=pt(6),  bIns=pt(6))
-INS_FOOTER = dict(lIns=pt(6),  rIns=pt(6),  tIns=0,      bIns=0)
+INS_CARD   = dict(lIns=pt(16), rIns=pt(16), tIns=pt(12), bIns=pt(12))
+INS_HEADER = dict(lIns=pt(16), rIns=pt(16), tIns=pt(8),  bIns=pt(8))
+INS_FOOTER = dict(lIns=pt(8),  rIns=pt(8),  tIns=0,      bIns=0)
 INS_NONE   = dict(lIns=0,      rIns=0,      tIns=0,      bIns=0)
 
-# ── Typography — standard sizes (pt) — aligned with VTI design system ─
-FONT_SECTION_TITLE = 52   # Layout G section title (range 50–54)
-FONT_TITLE         = 34   # slide title (range 32–36)
-FONT_CARD_HEADER   = 22   # card/step header (range 20–24)
-FONT_HEADER        = 22   # alias for FONT_CARD_HEADER
-FONT_BODY          = 15   # body/bullet text (range 14–16, floor 14)
-FONT_SMALL         = 13   # breadcrumb/small text (range 12–14)
-FONT_BADGE         = 17   # badge number text (range 16–18)
-FONT_STAT_BIG      = 60   # large KPI / stat number (range 56–64)
-FONT_STAT_LABEL    = 15   # stat label below number (range 14–16)
-FONT_CTA_HEADING   = 30   # CTA/Next Steps heading (range 28–32)
-FONT_COVER_TITLE   = 68   # cover main title (range 64–72)
-FONT_COVER_SUB     = 26   # cover subtitle (range 24–28)
+# ── Typography — standard sizes (pt) ─────────────────────────────────
+FONT_SECTION_TITLE = 69   # Layout G section title
+FONT_TITLE         = 40   # slide title
+FONT_CARD_HEADER   = 26   # card/step header
+FONT_HEADER        = 26   # alias for FONT_CARD_HEADER
+FONT_BODY          = 17   # body/bullet text
+FONT_SMALL         = 14   # breadcrumb/small text
+FONT_BADGE         = 22   # badge number text
+FONT_STAT_BIG      = 72   # large KPI / stat number
+FONT_STAT_LABEL    = 17   # stat label below number
+FONT_CTA_HEADING   = 40   # CTA/Next Steps heading
+FONT_COVER_TITLE   = 56   # cover main title
+FONT_COVER_SUB     = 32   # cover subtitle
 
 # ── Standard font ────────────────────────────────────────────────────
-FONT_NAME = "Arial"
+FONT_NAME = "Calibri"

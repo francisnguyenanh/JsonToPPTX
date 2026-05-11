@@ -36,7 +36,7 @@ def render(prs, slide_data: dict):
     spine_shape.text_frame.text = ""
 
     event_w = G.card_w(n)
-    card_h = G.CONTENT_H // 2 - G.pt(16)
+    card_h = G.CONTENT_H // 2 - G.pt(21)
 
     for i, event in enumerate(events):
         ex = G.card_x(i, n)
@@ -46,34 +46,34 @@ def render(prs, slide_data: dict):
         if i % 2 == 0:
             ey = G.CONTENT_TOP
         else:
-            ey = spine_y + G.pt(8)
+            ey = spine_y + G.pt(11)
 
         add_rounded_rect(slide, ex, ey, event_w, card_h,
-                         bg["from"], bg["to"])
+                         bg["from"], bg["to"], shadow=True)
 
         # Dot on spine
-        dot_x = ex + event_w // 2 - G.pt(5)
-        dot_y = spine_y - G.pt(4)
-        add_dot_bullet(slide, dot_x, dot_y, event.get("dot_color", "2362B0"), 8)
+        dot_x = ex + event_w // 2 - G.pt(7)
+        dot_y = spine_y - G.pt(5)
+        add_dot_bullet(slide, dot_x, dot_y, event.get("dot_color", "2362B0"), 10)
 
         # Date
-        add_textbox_styled(slide, ex + G.pt(8), ey + G.pt(6),
-                           event_w - G.pt(16), G.pt(18),
+        add_textbox_styled(slide, ex + G.pt(11), ey + G.pt(8),
+                           event_w - G.pt(21), G.pt(24),
                            event.get("date", ""), bold=True, size_pt=G.FONT_SMALL,
                            color_hex=event.get("date_color", "6A7FA0"),
                            v_anchor="t", inset=G.INS_NONE, autofit="none")
 
         # Label
-        add_textbox_styled(slide, ex + G.pt(8), ey + G.pt(24),
-                           event_w - G.pt(16), G.pt(22),
+        add_textbox_styled(slide, ex + G.pt(11), ey + G.pt(32),
+                           event_w - G.pt(21), G.pt(29),
                            event.get("label", ""), bold=True, size_pt=G.FONT_BODY,
                            color_hex=event.get("text_color", "1C2D4F"),
                            v_anchor="t", inset=G.INS_NONE, autofit="none", wrap=True)
 
         # Description
         if event.get("description"):
-            add_textbox_styled(slide, ex + G.pt(8), ey + G.pt(50),
-                               event_w - G.pt(16), card_h - G.pt(56),
+            add_textbox_styled(slide, ex + G.pt(11), ey + G.pt(67),
+                               event_w - G.pt(21), card_h - G.pt(75),
                                event["description"], size_pt=G.FONT_SMALL,
                                color_hex=event.get("text_color", "1C2D4F"),
                                v_anchor="t", inset=G.INS_NONE, autofit="norm", wrap=True)

@@ -81,15 +81,28 @@ def _set_solid_fill_on_spPr(spPr, hex_color: str, alpha: int = None):
         etree.SubElement(srgbClr, qn("a:alpha"), val=str(alpha))
 
 
+def _add_effect_shadow(spPr):
+    """Kimi-style outer drop shadow: blurred, subtle, downward-cast."""
+    effectLst = spPr.find(qn("a:effectLst"))
+    if effectLst is None:
+        effectLst = etree.SubElement(spPr, qn("a:effectLst"))
+    outerShdw = etree.SubElement(effectLst, qn("a:outerShdw"),
+                                  blurRad="127000", dist="38100", dir="5400000")
+    srgbClr = etree.SubElement(outerShdw, qn("a:srgbClr"), val="000000")
+    etree.SubElement(srgbClr, qn("a:alpha"), val="3137")
+
+
 # ── Rounded rectangle ────────────────────────────────────────────────
 
 def add_rounded_rect(slide, x: int, y: int, w: int, h: int,
                      from_hex: str, to_hex: str,
                      angle_emu: int = 16200000,
-                     border_hex: str = None, border_w_pt: float = 0):
+                     border_hex: str = None, border_w_pt: float = 0,
+                     shadow: bool = False, corner_adj: int = 8000):
     """
-    Add roundRect shape (adj=20000, ~16% corner radius).
-    Optional top border as separate thin rect if border_hex provided.
+    Add roundRect shape with gradient fill.
+    shadow=True adds a Kimi-style drop shadow.
+    corner_adj: 0-50000, controls corner rounding (8000 ≈ 8% of min dimension).
     Returns the shape object.
     """
     from pptx.util import Emu as _Emu
@@ -98,7 +111,6 @@ def add_rounded_rect(slide, x: int, y: int, w: int, h: int,
         _Emu(x), _Emu(y), _Emu(w), _Emu(h)
     )
 
-    # Set preset geometry to roundRect with a slightly more rounded corner
     spPr = shape._element.spPr
     prstGeom = spPr.find(qn("a:prstGeom"))
     if prstGeom is not None:
@@ -109,19 +121,19 @@ def add_rounded_rect(slide, x: int, y: int, w: int, h: int,
         else:
             for gd in avLst.findall(qn("a:gd")):
                 avLst.remove(gd)
-        etree.SubElement(avLst, qn("a:gd"), name="adj", fmla="val 20000")
+        etree.SubElement(avLst, qn("a:gd"), name="adj", fmla=f"val {corner_adj}")
 
-    # Remove line (border)
     ln = spPr.find(qn("a:ln"))
     if ln is not None:
         spPr.remove(ln)
     ln_el = etree.SubElement(spPr, qn("a:ln"))
     etree.SubElement(ln_el, qn("a:noFill"))
 
-    # Gradient fill
     _set_gradient_fill_on_spPr(spPr, from_hex, to_hex, angle_emu)
 
-    # Optional top border line
+    if shadow:
+        _add_effect_shadow(spPr)
+
     if border_hex:
         bw = G.pt(border_w_pt) if border_w_pt else G.pt(3)
         border = slide.shapes.add_shape(1, _Emu(x), _Emu(y), _Emu(w), _Emu(bw))
@@ -137,6 +149,32 @@ def add_rounded_rect(slide, x: int, y: int, w: int, h: int,
         if prstGeomB is not None:
             prstGeomB.set("prst", "rect")
 
+    return shape
+
+
+def add_solid_roundrect(slide, x: int, y: int, w: int, h: int,
+                        color_hex: str, corner_adj: int = 8000):
+    """Solid-color rounded rect — used for card header strips. corner_adj=8000 matches Kimi."""
+    from pptx.util import Emu as _Emu
+    shape = slide.shapes.add_shape(1, _Emu(x), _Emu(y), _Emu(w), _Emu(h))
+    spPr = shape._element.spPr
+    prstGeom = spPr.find(qn("a:prstGeom"))
+    if prstGeom is not None:
+        prstGeom.set("prst", "roundRect")
+        avLst = prstGeom.find(qn("a:avLst"))
+        if avLst is None:
+            avLst = etree.SubElement(prstGeom, qn("a:avLst"))
+        for gd in avLst.findall(qn("a:gd")):
+            avLst.remove(gd)
+        etree.SubElement(avLst, qn("a:gd"), name="adj", fmla=f"val {corner_adj}")
+    _set_solid_fill_on_spPr(spPr, color_hex)
+    ln = spPr.find(qn("a:ln"))
+    if ln is not None:
+        spPr.remove(ln)
+    etree.SubElement(spPr, qn("a:ln")).append(
+        etree.fromstring('<a:noFill xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>')
+    )
+    shape.text_frame.text = ""
     return shape
 
 
@@ -364,7 +402,7 @@ def add_semantic_icon(slide, x: int, y: int, size_pt: float,
         return s
 
     # Background glow circle (semi-transparent)
-    filled("ellipse", x, y, sz, sz, stroke_hex, alpha=18000)
+    filled("ellipse", x, y, sz, sz, stroke_hex, alpha=28000)
 
     # Inner icon zone with padding
     pad = sz // 5

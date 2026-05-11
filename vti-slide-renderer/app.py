@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from xml.etree import ElementTree as ET
 
 from flask import Flask, jsonify, request, Response, render_template
 
@@ -134,6 +135,64 @@ def design_intent():
 
     resolved = resolve_deck(intent_deck)
     return jsonify({"intent": intent_deck, "resolved": resolved})
+
+
+@app.route("/svg-to-pptx", methods=["POST"])
+def svg_to_pptx():
+    """
+    Convert one or more SVG strings to a single .pptx file.
+    Each SVG becomes one slide.
+
+    Body (JSON):
+      {
+        "title": "Deck title",          // optional, default "presentation"
+        "slides": ["<svg>...</svg>", …] // required, min 1 element
+      }
+    """
+    if not request.is_json:
+        return jsonify({"error": "Content-Type must be application/json"}), 415
+
+    body = request.get_json(silent=True) or {}
+    slides_svg: list = body.get("slides", [])
+    if not slides_svg or not isinstance(slides_svg, list):
+        return jsonify({"error": "'slides' must be a non-empty list of SVG strings"}), 400
+
+    title = body.get("title", "presentation")
+
+    try:
+        from renderer.svg_parser import parse_svg_to_slide
+        from pptx import Presentation
+        from pptx.util import Emu
+        from renderer import geometry as G
+        import io
+
+        prs = Presentation()
+        prs.slide_width  = Emu(G.SLIDE_W)
+        prs.slide_height = Emu(G.SLIDE_H)
+
+        for svg_str in slides_svg:
+            if not isinstance(svg_str, str) or not svg_str.strip():
+                return jsonify({"error": "Each slide must be a non-empty SVG string"}), 400
+            parse_svg_to_slide(prs, svg_str)
+
+        buf = io.BytesIO()
+        prs.save(buf)
+        pptx_bytes = buf.getvalue()
+
+    except ET.ParseError as e:
+        return jsonify({"error": f"SVG parse error: {e}"}), 400
+    except Exception as e:
+        app.logger.exception("SVG render error")
+        return jsonify({"error": str(e)}), 500
+
+    safe_title = "".join(c if c.isalnum() or c in " _-" else "_" for c in title).strip()
+    filename = f"{safe_title or 'presentation'}.pptx"
+
+    return Response(
+        pptx_bytes,
+        mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+    )
 
 
 @app.route("/health", methods=["GET"])

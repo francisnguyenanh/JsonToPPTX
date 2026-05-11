@@ -18,7 +18,7 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["slide_number", "layout", "section_idx", "design"],
+        "required": ["slide_number", "layout", "design"],
         "properties": {
           "slide_number": { "type": "integer", "minimum": 1 },
           "layout": {

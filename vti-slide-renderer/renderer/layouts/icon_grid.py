@@ -33,20 +33,19 @@ def render(prs, slide_data: dict):
 
         bg = cell.get("bg", {"from": "EBF4FC", "to": "D6EAF8"})
         add_rounded_rect(slide, cx, cy, cw, ch,
-                         bg["from"], bg["to"],
-                         border_hex=cell.get("border_top"), border_w_pt=3)
+                         bg["from"], bg["to"], shadow=True)
 
-        inner_x = cx + G.pt(8)
-        inner_w = cw - G.pt(16)
+        inner_x = cx + G.pt(11)
+        inner_w = cw - G.pt(21)
 
         # Calculate vertical layout: icon + label + sub_label
         icon = cell.get("icon")
         has_label = bool(cell.get("label"))
         has_sub = bool(cell.get("sub_label"))
-        icon_sz = icon.get("size_pt", 36) if icon else 0
-        label_h = G.pt(24) if has_label else 0
-        sub_h = G.pt(20) if has_sub else 0
-        gap = G.pt(6)
+        icon_sz = icon.get("size_pt", 48) if icon else 0
+        label_h = G.pt(32) if has_label else 0
+        sub_h = G.pt(27) if has_sub else 0
+        gap = G.pt(8)
         total_h = G.pt(icon_sz) + (gap if icon_sz else 0) + label_h + sub_h
         cur_y = cy + (ch - total_h) // 2  # vertical center
 

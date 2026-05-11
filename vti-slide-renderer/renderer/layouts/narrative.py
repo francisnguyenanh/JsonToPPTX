@@ -24,8 +24,8 @@ def render(prs, slide_data: dict):
                      breadcrumb_color=d.get("breadcrumb_color", "6A7FA0"))
 
     # Zone split: 57% left panel, 5% gap, 38% right panel
-    right_w = G.pt(340)
-    gap = G.pt(16)
+    right_w = G.pt(453)
+    gap = G.pt(21)
     left_w = G.CONTENT_W - right_w - gap
 
     left_x = G.CONTENT_X
@@ -40,29 +40,27 @@ def render(prs, slide_data: dict):
     bullets = left_panel.get("bullets", [])
 
     if body_text:
-        # Reserve space for bullets: 32pt per bullet + 8pt gap before first bullet
-        bullet_reserve = len(bullets) * G.pt(32) + (G.pt(12) if bullets else 0)
-        body_h = max(G.CONTENT_H - bullet_reserve, G.pt(80))
+        body_h = G.pt(233) if bullets else G.CONTENT_H
         add_textbox_styled(
             slide, left_x, cur_y, left_w, body_h,
             body_text,
             size_pt=G.FONT_BODY, color_hex=text_color,
             v_anchor="t", inset=G.INS_CARD,
             autofit="norm", wrap=True,
-            line_spacing=1.5
+            line_spacing=1.4
         )
-        cur_y += body_h + G.pt(10)
+        cur_y += body_h + G.pt(11)
 
     for bullet in bullets:
-        add_dot_bullet(slide, left_x + G.pt(4), cur_y + G.pt(6),
+        add_dot_bullet(slide, left_x + G.pt(5), cur_y + G.pt(8),
                        bullet.get("dot_color", "4A9EE0"), 6)
-        add_textbox_styled(slide, left_x + G.pt(18), cur_y,
-                           left_w - G.pt(18), G.pt(28),
+        add_textbox_styled(slide, left_x + G.pt(24), cur_y,
+                           left_w - G.pt(24), G.pt(37),
                            bullet.get("text", ""),
                            size_pt=G.FONT_BODY, color_hex=text_color,
                            v_anchor="t", inset=G.INS_NONE,
                            autofit="norm", wrap=True)
-        cur_y += G.pt(32)
+        cur_y += G.pt(40)
 
     # ── Right panel: tinted card + icon + optional callout ────────────
     right_panel = d.get("right_panel", {})
@@ -81,8 +79,8 @@ def render(prs, slide_data: dict):
         if callout_number:
             add_textbox_styled(
                 slide,
-                right_x + G.pt(8), G.CONTENT_TOP + G.pt(60),
-                right_w - G.pt(16), G.pt(80),
+                right_x + G.pt(11), G.CONTENT_TOP + G.pt(80),
+                right_w - G.pt(21), G.pt(107),
                 callout_number,
                 bold=True, size_pt=G.FONT_STAT_BIG,
                 color_hex=right_panel.get("border_top", "2362B0"),
@@ -91,8 +89,8 @@ def render(prs, slide_data: dict):
             if callout_label:
                 add_textbox_styled(
                     slide,
-                    right_x + G.pt(8), G.CONTENT_TOP + G.pt(145),
-                    right_w - G.pt(16), G.pt(28),
+                    right_x + G.pt(11), G.CONTENT_TOP + G.pt(193),
+                    right_w - G.pt(21), G.pt(37),
                     callout_label,
                     size_pt=G.FONT_STAT_LABEL,
                     color_hex="6A7FA0",

@@ -28,33 +28,32 @@ def render(prs, slide_data: dict):
 
     # ── Left accent block (16pt wide gradient bar) ───────────────────
     alb = d.get("accent_block_left", {"from": "2362B0", "to": "7FC236"})
-    bar_w = G.pt(14)
+    bar_w = G.pt(19)
     accent_block = slide.shapes.add_shape(
         1, Emu(G.CONTENT_X), Emu(G.CONTENT_TOP),
-        Emu(bar_w), Emu(G.CONTENT_H - G.pt(65))
+        Emu(bar_w), Emu(G.CONTENT_H - G.pt(87))
     )
     _set_gradient_fill_on_spPr(accent_block._element.spPr,
                                 alb["from"], alb["to"], alb.get("angle", 0))
     remove_line(accent_block._element.spPr)
     accent_block.text_frame.text = ""
 
-    # ── Decorative large quote mark (background, Pattern 8 style) ────
+    # ── Decorative large quote mark ────────────────────────────────────
     qmark_color = d.get("quote_mark_color", "2362B0")
-    # Render as faint large text shape (not Pattern 8 ellipse)
     add_textbox_styled(
         slide,
-        G.CONTENT_X + bar_w, G.CONTENT_TOP - G.pt(15),
-        G.pt(90), G.pt(90), "“",
-        size_pt=110, color_hex=qmark_color,
+        G.CONTENT_X + bar_w, G.CONTENT_TOP - G.pt(13),
+        G.pt(107), G.pt(96), "“",
+        size_pt=120, color_hex=qmark_color,
         bold=True, v_anchor="t", inset=G.INS_NONE, autofit="none"
     )
 
-    # ── Quote text zone ──────────────────────────────────────────────
-    quote_x = G.CONTENT_X + bar_w + G.pt(40)
-    quote_w = G.CONTENT_W - bar_w - G.pt(50)
-    quote_top = G.CONTENT_TOP + G.pt(28)
-    context_h = G.pt(58)
-    quote_h = G.CONTENT_H - G.pt(65) - context_h - G.pt(8)
+    # ── Quote text zone — starts below the quote mark glyph ──────────
+    quote_x = G.CONTENT_X + bar_w + G.pt(48)
+    quote_w = G.CONTENT_W - bar_w - G.pt(61)
+    quote_top = G.CONTENT_TOP + G.pt(96)
+    context_h = G.pt(77)
+    quote_h = G.CONTENT_H - G.pt(96) - context_h - G.pt(11)
 
     # quote_text is the primary key; fall back to legacy "quote"
     quote_text = d.get("quote_text", d.get("quote", ""))
@@ -71,13 +70,13 @@ def render(prs, slide_data: dict):
 
     # Attribution
     if d.get("attribution"):
-        attr_y = G.CONTENT_TOP + G.CONTENT_H - G.pt(65) - G.pt(26)
+        attr_y = G.CONTENT_TOP + G.CONTENT_H - context_h - G.pt(40)
         attr_text = d["attribution"]
         if not attr_text.startswith("—"):
             attr_text = "— " + attr_text
         add_textbox_styled(
             slide,
-            quote_x, attr_y, quote_w, G.pt(24),
+            quote_x, attr_y, quote_w, G.pt(32),
             attr_text,
             size_pt=G.FONT_BODY,
             color_hex=d.get("attribution_color", "6A7FA0"),
@@ -95,8 +94,8 @@ def render(prs, slide_data: dict):
                          angle_emu=ctx_bg.get("angle", 16200000))
         add_textbox_styled(
             slide,
-            G.CONTENT_X + G.pt(12), ctx_y,
-            G.CONTENT_W - G.pt(24), context_h,
+            G.CONTENT_X + G.pt(16), ctx_y,
+            G.CONTENT_W - G.pt(32), context_h,
             ctx_text,
             size_pt=G.FONT_BODY,
             color_hex=d.get("context_text_color", "1C2D4F"),

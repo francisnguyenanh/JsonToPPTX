@@ -28,22 +28,22 @@ def render(prs, slide_data: dict):
                        G.pt(1), G.CONTENT_H, sep_color)
 
     def draw_items(items, start_x):
-        cy = G.CONTENT_TOP + G.pt(8)
-        row_h = G.pt(52)
+        cy = G.CONTENT_TOP + G.pt(11)
+        row_h = G.pt(69)
         for item in items:
             dot_color = item.get("badge_color", "2362B0")
-            dot_size = 8
+            dot_size = 10
             # Vertically centre the dot with the text line
-            add_dot_bullet(slide, start_x + G.pt(4),
+            add_dot_bullet(slide, start_x + G.pt(5),
                            cy + G.pt(row_h // 2 // G.PT - dot_size // 2),
                            dot_color, dot_size)
-            add_textbox_styled(slide, start_x + G.pt(18), cy,
-                               col_w - G.pt(20), row_h,
+            add_textbox_styled(slide, start_x + G.pt(24), cy,
+                               col_w - G.pt(27), row_h,
                                item.get("text", ""),
                                size_pt=G.FONT_BODY,
                                color_hex=item.get("text_color", "1C2D4F"),
                                v_anchor="m", inset=G.INS_NONE, autofit="norm", wrap=True)
-            cy += row_h + G.pt(4)
+            cy += row_h + G.pt(5)
 
     draw_items(d.get("left_items", []), left_x)
     draw_items(d.get("right_items", []), right_x)

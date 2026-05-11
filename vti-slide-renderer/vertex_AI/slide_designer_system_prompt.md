@@ -55,7 +55,7 @@ Do NOT use Layout A for more than 40% of slides.
 
 ## CONTENT DENSITY RULES
 
-- Slide title: max 10 words
+- Slide title: max 10 words — prefix with `▎` + space (U+258E vertical bar) for visual emphasis
 - Card header: max 6 words
 - Bullets: max 3 per card, each max 2 lines
 - Flow steps: max 5
@@ -79,7 +79,7 @@ Output a single JSON object. No explanation, no markdown, no code fences. Only J
 }
 ```
 
-`theme`: "VTI" | "Dark" | "Light" — use the value provided by the user.
+`theme`: "VTI" | "Dark" | "Light" | "Kimi" — use the value provided by the user.
 `lang`: "vi" | "jp" — use the value provided by the user.
 
 ### Slide object — common fields for all layouts
@@ -162,11 +162,12 @@ Output a single JSON object. No explanation, no markdown, no code fences. Only J
   "layout": "E", "section_idx": 0,
   "title": "...", "breadcrumb": "...",
   "stats": [
-    { "number": "98%", "unit": "", "label": "Completion rate" }
+    { "number": "98%", "label": "Completion rate" }
   ],
   "context_text": "Supporting summary sentence."
 }
 ```
+`number`: include unit/symbol directly in the string (e.g. "98%", "5.3B", "↑40%", "2×"). No separate unit field.
 
 **Layout F — Left-Text Right-Visual**
 ```json

@@ -10,7 +10,10 @@
       "Bash(Get-ChildItem -Path \"c:\\\\4. DEV\\\\GitHub\\(Onlyone\\)\\\\JsonToPPTX\" -Recurse -Force)",
       "Bash(Select-Object -Property FullName)",
       "Bash(python -c \"from renderer import engine; print\\('OK'\\)\")",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "PowerShell(Get-ChildItem \"c:\\\\4. DEV\\\\GitHub\\(Onlyone\\)\\\\JsonToPPTX\" | Where-Object { -not $_.PSIsContainer } | Select-Object Name)",
+      "Bash(python test_input.py)",
+      "Bash(python test_fixed.py)"
     ]
   }
 }

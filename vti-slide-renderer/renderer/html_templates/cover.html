@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<style>
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    font-family: "Calibri", "Noto Sans", "Arial", sans-serif;
+    position: relative;
+    background: {{ bg_gradient }};
+  }
+
+  /* ── Left vertical bar (11pt ≈ 14.7px) ── */
+  .left-bar {
+    position: absolute;
+    left: 0; top: 0;
+    width: 15px;
+    height: 720px;
+    background: {{ left_bar_gradient }};
+  }
+
+  /* ── Right decorative strip (187pt ≈ 249px) ── */
+  .right-strip {
+    position: absolute;
+    right: 0; top: 0;
+    width: 249px;
+    height: 720px;
+    background: linear-gradient(to right, {{ right_strip_from }}, {{ right_strip_to }});
+  }
+
+  /* ── Right card (307pt × 547pt, positioned right of strip edge) ── */
+  /* card_x = strip_x - 347pt ≈ 1280-249-463 = 568px from left
+     card_y = 80pt ≈ 107px
+     card_w = 307pt ≈ 409px, card_h = 547pt ≈ 729px clipped to 720 */
+  .right-card {
+    position: absolute;
+    left: 568px;
+    top: 80px;
+    width: 409px;
+    height: 613px;
+    background: {{ rc_gradient }};
+    border-radius: 12px;
+    border-top: 5px solid {{ rc_border_top }};
+    overflow: hidden;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.10);
+  }
+
+  /* Decorative circle inside card (bottom-right, very subtle) */
+  .right-card::after {
+    content: "";
+    position: absolute;
+    bottom: -90px;
+    right: -90px;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: {{ rc_decor_color }};
+  }
+
+  /* ── Left content zone ── */
+  /* tx = bar_w + 27pt ≈ 15 + 36 = 51px
+     text_w = card_x - tx - 27pt ≈ 568 - 51 - 36 = 481px */
+  .content {
+    position: absolute;
+    left: 51px;
+    top: 0;
+    width: 481px;
+    height: 720px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Tag badge (y=107pt ≈ 143px, h=29pt ≈ 39px) */
+  .tag {
+    font-size: 20px;
+    font-weight: 700;
+    color: {{ tag_color }};
+    margin-bottom: 18px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    min-height: 1px;
+  }
+
+  /* Divider bar (y=411pt ≈ 548px, h=5pt) — shown as accent line above title */
+  .divider {
+    width: 356px;
+    height: 6px;
+    background: {{ divider_gradient }};
+    border-radius: 3px;
+    margin-bottom: 22px;
+  }
+
+  /* Main title (56pt Calibri bold) */
+  .title {
+    font-size: 64px;
+    font-weight: 700;
+    color: {{ title_color }};
+    line-height: 1.12;
+    margin-bottom: 22px;
+    word-break: break-word;
+  }
+
+  /* Subtitle (32pt) */
+  .subtitle {
+    font-size: 36px;
+    font-weight: 400;
+    color: {{ subtitle_color }};
+    line-height: 1.25;
+    margin-bottom: 14px;
+    min-height: 1px;
+  }
+
+  /* Caption (16pt muted) */
+  .caption {
+    font-size: 18px;
+    color: {{ caption_color }};
+    line-height: 1.4;
+    min-height: 1px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    width: 1280px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 15px;
+  }
+
+  .footer-badge {
+    width: 56px;
+    height: 46px;
+    background: #408DD6;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #FFFFFF;
+    flex-shrink: 0;
+  }
+
+  .footer-copy {
+    font-size: 12px;
+    color: #808080;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+  <div class="left-bar"></div>
+  <div class="right-strip"></div>
+
+  <div class="right-card"></div>
+
+  <div class="content">
+    {% if tag %}<div class="tag">{{ tag }}</div>{% endif %}
+    <div class="divider"></div>
+    <div class="title">{{ title }}</div>
+    {% if subtitle %}<div class="subtitle">{{ subtitle }}</div>{% endif %}
+    {% if caption %}<div class="caption">{{ caption }}</div>{% endif %}
+  </div>
+
+  <div class="footer">
+    <div class="footer-badge">{{ slide_number }}</div>
+    <div class="footer-copy">Copyright &copy; 2026 VTI All rights reserved</div>
+  </div>
+</body>
+</html>

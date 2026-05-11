@@ -33,7 +33,7 @@ def render(prs, slide_data: dict):
 
     # ── Left bar ─────────────────────────────────────────────────────
     lb = d.get("left_bar", {"from": "2362B0", "to": "7FC236"})
-    bar_w = G.pt(8)
+    bar_w = G.pt(11)
     bar = slide.shapes.add_shape(1, Emu(0), Emu(0), Emu(bar_w), Emu(G.SLIDE_H))
     _set_gradient_fill_on_spPr(bar._element.spPr,
                                 lb["from"], lb["to"], 18000000)
@@ -42,7 +42,7 @@ def render(prs, slide_data: dict):
 
     # ── Decorative circle (top-right) ────────────────────────────────
     decor = d.get("decor", {"color": "1A3070", "opacity": 20})
-    dec_sz = G.pt(300)
+    dec_sz = G.pt(400)
     dec_x = G.SLIDE_W - dec_sz // 2
     dec_y = -dec_sz // 4
     dec_shape = slide.shapes.add_shape(9, Emu(dec_x), Emu(dec_y),
@@ -61,9 +61,9 @@ def render(prs, slide_data: dict):
 
     # ── Right card (tinted roundRect + top border + hero icon) ──────
     rc = d.get("right_card", {})
-    card_w = G.pt(240)
-    card_h = G.pt(360)
-    card_x = G.SLIDE_W - card_w - G.pt(40)
+    card_w = G.pt(320)
+    card_h = G.pt(480)
+    card_x = G.SLIDE_W - card_w - G.pt(53)
     card_y = (G.SLIDE_H - card_h) // 2
     rc_bg = rc.get("bg", {"from": "EBF4FC", "to": "D6EAF8"})
     add_rounded_rect(slide, card_x, card_y, card_w, card_h,
@@ -74,8 +74,8 @@ def render(prs, slide_data: dict):
 
     # Decor ellipse (Pattern 8) inside card
     add_decor_shape(slide,
-                    card_x + G.pt(100), card_y + G.pt(220),
-                    G.pt(180), G.pt(180),
+                    card_x + G.pt(133), card_y + G.pt(293),
+                    G.pt(240), G.pt(240),
                     rc.get("border_top", "4A9EE0"), alpha_percent=7)
 
     icon_def = rc.get("icon", {})
@@ -88,27 +88,27 @@ def render(prs, slide_data: dict):
                           icon_def.get("type", "default"))
 
     # ── Text content ─────────────────────────────────────────────────
-    tx = G.pt(28)
-    text_w = card_x - G.pt(60)
-    cy = G.SLIDE_H // 2 - G.pt(80)
+    tx = G.pt(37)
+    text_w = card_x - G.pt(80)
+    cy = G.SLIDE_H // 2 - G.pt(107)
 
     if d.get("section_number"):
-        add_textbox_styled(slide, tx, cy, text_w, G.pt(30),
-                           d["section_number"], bold=True, size_pt=22,
+        add_textbox_styled(slide, tx, cy, text_w, G.pt(40),
+                           d["section_number"], bold=True, size_pt=29,
                            color_hex=d.get("section_number_color", "6A7FA0"),
                            v_anchor="m", inset=G.INS_NONE, autofit="none")
-        cy += G.pt(36)
+        cy += G.pt(48)
 
     if d.get("section_title"):
-        add_textbox_styled(slide, tx, cy, text_w, G.pt(70),
+        add_textbox_styled(slide, tx, cy, text_w, G.pt(93),
                            d["section_title"], bold=True,
                            size_pt=G.FONT_SECTION_TITLE,
                            color_hex=d.get("section_title_color", "FFFFFF"),
                            v_anchor="t", inset=G.INS_NONE, autofit="norm", wrap=True)
-        cy += G.pt(80)
+        cy += G.pt(107)
 
     if d.get("subtitle"):
-        add_textbox_styled(slide, tx, cy, text_w, G.pt(36),
+        add_textbox_styled(slide, tx, cy, text_w, G.pt(48),
                            d["subtitle"], size_pt=G.FONT_BODY,
                            color_hex=d.get("subtitle_color", "B8D0EE"),
                            v_anchor="m", inset=G.INS_NONE, autofit="none", wrap=True)

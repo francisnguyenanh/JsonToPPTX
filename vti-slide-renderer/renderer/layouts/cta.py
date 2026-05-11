@@ -33,17 +33,17 @@ def render(prs, slide_data: dict):
 
     # ── Decor circles (Pattern 8) — top-right and bottom-left ───────
     decor_color = d.get("decor_color", "2362B0")
-    dec_sz = G.pt(300)
+    dec_sz = G.pt(400)
     # Top-right corner circle
     add_decor_shape(slide, G.SLIDE_W - dec_sz // 2, -dec_sz // 4,
                     dec_sz, dec_sz, decor_color, alpha_percent=7)
     # Bottom-left corner circle (smaller, accent colour)
-    dec_sz2 = G.pt(220)
+    dec_sz2 = G.pt(293)
     add_decor_shape(slide, -dec_sz2 // 3, G.SLIDE_H - dec_sz2 * 3 // 4,
                     dec_sz2, dec_sz2, "7FC236", alpha_percent=6)
 
     # ── Heading ──────────────────────────────────────────────────────
-    add_textbox_styled(slide, G.CONTENT_X, G.pt(55), G.CONTENT_W, G.pt(55),
+    add_textbox_styled(slide, G.CONTENT_X, G.pt(73), G.CONTENT_W, G.pt(73),
                        d.get("heading", "Next Steps"), bold=True,
                        size_pt=G.FONT_CTA_HEADING,
                        color_hex=d.get("heading_color", "FFFFFF"),
@@ -51,7 +51,7 @@ def render(prs, slide_data: dict):
 
     # ── Divider ──────────────────────────────────────────────────────
     div_color = d.get("divider_color", "FFFFFF")
-    add_separator_line(slide, G.CONTENT_X, G.pt(115), G.CONTENT_W, G.pt(1), div_color)
+    add_separator_line(slide, G.CONTENT_X, G.pt(153), G.CONTENT_W, G.pt(1), div_color)
 
     # ── Items ────────────────────────────────────────────────────────
     items = d.get("items", [])
@@ -63,15 +63,15 @@ def render(prs, slide_data: dict):
         iy = G.CONTENT_TOP + G.pt(10)
 
         badge_color = item.get("badge_color", "7FC236")
-        add_badge(slide, ix, iy, str(i + 1), badge_color, size_pt=18)
+        add_badge(slide, ix, iy, str(i + 1), badge_color, size_pt=24)
 
-        title_y = iy + G.pt(26)
-        add_textbox_styled(slide, ix, title_y, item_w, G.pt(24),
+        title_y = iy + G.pt(35)
+        add_textbox_styled(slide, ix, title_y, item_w, G.pt(32),
                            item.get("title", ""), bold=True, size_pt=G.FONT_HEADER,
                            color_hex=item.get("text_color", "FFFFFF"),
                            v_anchor="t", inset=G.INS_NONE, autofit="none", wrap=True)
 
-        desc_y = title_y + G.pt(28)
+        desc_y = title_y + G.pt(37)
         add_textbox_styled(slide, ix, desc_y, item_w,
                            G.CONTENT_H - G.pt(56),
                            item.get("description", ""),

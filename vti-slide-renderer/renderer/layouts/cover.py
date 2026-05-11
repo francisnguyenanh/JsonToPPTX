@@ -30,7 +30,7 @@ def render(prs, slide_data: dict):
 
     # ── Left vertical bar ────────────────────────────────────────────
     lb = d.get("left_bar", {"from": "172759", "to": "2362B0"})
-    bar_w = G.pt(8)
+    bar_w = G.pt(11)
     left_bar = slide.shapes.add_shape(1, Emu(0), Emu(0), Emu(bar_w), Emu(G.SLIDE_H))
     _set_gradient_fill_on_spPr(left_bar._element.spPr,
                                 lb["from"], lb["to"], lb.get("angle", 0))
@@ -39,7 +39,7 @@ def render(prs, slide_data: dict):
 
     # ── Right decorative strip (semi-transparent) ────────────────────
     rs = d.get("right_strip", {"from": "2362B0", "to": "4A9EE0", "opacity": 30})
-    strip_w = G.pt(140)
+    strip_w = G.pt(187)
     strip_x = G.SLIDE_W - strip_w
     opacity = rs.get("opacity", 30)
     alpha_emu = int(opacity / 100 * 100000)
@@ -60,10 +60,10 @@ def render(prs, slide_data: dict):
 
     # ── Right card (tinted, roundRect with top border + hero icon) ───
     rc = d.get("right_card", {})
-    card_x = strip_x - G.pt(260)
-    card_y = G.pt(60)
-    card_w = G.pt(230)
-    card_h = G.pt(410)
+    card_x = strip_x - G.pt(347)
+    card_y = G.pt(80)
+    card_w = G.pt(307)
+    card_h = G.pt(547)
 
     rc_bg = rc.get("bg", {"from": "EBF4FC", "to": "D6EAF8"})
     add_rounded_rect(slide, card_x, card_y, card_w, card_h,
@@ -74,8 +74,8 @@ def render(prs, slide_data: dict):
 
     # Decor ellipse inside right card (Pattern 8 — subtle depth)
     add_decor_shape(slide,
-                    card_x + G.pt(100), card_y + G.pt(260),
-                    G.pt(180), G.pt(180),
+                    card_x + G.pt(133), card_y + G.pt(347),
+                    G.pt(240), G.pt(240),
                     rc.get("border_top", "7FC236"), alpha_percent=7)
 
     # Hero icon centred in right card
@@ -90,11 +90,11 @@ def render(prs, slide_data: dict):
 
     # ── Divider bar ──────────────────────────────────────────────────
     div = d.get("divider_bar", {"from": "2362B0", "to": "7FC236"})
-    tx = bar_w + G.pt(20)
-    text_w = card_x - tx - G.pt(20)
+    tx = bar_w + G.pt(27)
+    text_w = card_x - tx - G.pt(27)
 
-    div_y = G.pt(258)
-    div_shape = slide.shapes.add_shape(1, Emu(tx), Emu(div_y), Emu(G.pt(200)), Emu(G.pt(4)))
+    div_y = G.pt(411)
+    div_shape = slide.shapes.add_shape(1, Emu(tx), Emu(div_y), Emu(G.pt(267)), Emu(G.pt(5)))
     _set_gradient_fill_on_spPr(div_shape._element.spPr,
                                 div["from"], div["to"], 5400000)
     _rm(div_shape._element.spPr)
@@ -103,13 +103,13 @@ def render(prs, slide_data: dict):
     # ── Text content (left zone) ─────────────────────────────────────
     # Tag
     if d.get("tag"):
-        add_textbox_styled(slide, tx, G.pt(78), text_w, G.pt(26),
+        add_textbox_styled(slide, tx, G.pt(107), text_w, G.pt(29),
                            d["tag"], bold=True,
-                           size_pt=12, color_hex=d.get("tag_color", "2362B0"),
+                           size_pt=15, color_hex=d.get("tag_color", "2362B0"),
                            v_anchor="m", inset=G.INS_NONE, autofit="none")
 
-    # Title
-    add_textbox_styled(slide, tx, G.pt(106), text_w, G.pt(145),
+    # Title — tall box: normAutofit shrinks for longer titles
+    add_textbox_styled(slide, tx, G.pt(141), text_w, G.pt(256),
                        d.get("title", ""), bold=True,
                        size_pt=G.FONT_COVER_TITLE,
                        color_hex=d.get("title_color", "172759"),
@@ -117,15 +117,15 @@ def render(prs, slide_data: dict):
 
     # Subtitle
     if d.get("subtitle"):
-        add_textbox_styled(slide, tx, G.pt(272), text_w, G.pt(55),
+        add_textbox_styled(slide, tx, G.pt(424), text_w, G.pt(67),
                            d["subtitle"], size_pt=G.FONT_COVER_SUB,
                            color_hex=d.get("subtitle_color", "172759"),
-                           v_anchor="m", inset=G.INS_NONE, autofit="none", wrap=True)
+                           v_anchor="m", inset=G.INS_NONE, autofit="norm", wrap=True)
 
     # Caption
     if d.get("caption"):
-        add_textbox_styled(slide, tx, G.pt(340), text_w, G.pt(28),
-                           d["caption"], size_pt=12,
+        add_textbox_styled(slide, tx, G.pt(499), text_w, G.pt(35),
+                           d["caption"], size_pt=16,
                            color_hex=d.get("caption_color", "6A7FA0"),
                            v_anchor="m", inset=G.INS_NONE, autofit="none")
 

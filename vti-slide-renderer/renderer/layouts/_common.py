@@ -55,16 +55,16 @@ def add_slide_header(slide, title: str, breadcrumb: str = "",
     if breadcrumb:
         add_textbox_styled(
             slide,
-            G.CONTENT_X, G.pt(18),
-            G.CONTENT_W, G.pt(20),
+            G.CONTENT_X, G.pt(24),
+            G.CONTENT_W, G.pt(27),
             breadcrumb,
             size_pt=G.FONT_SMALL, color_hex=breadcrumb_color,
             v_anchor="m", inset=G.INS_NONE, autofit="norm"
         )
     add_textbox_styled(
         slide,
-        G.CONTENT_X, G.pt(38),
-        G.CONTENT_W, G.pt(45),
+        G.CONTENT_X, G.pt(51),
+        G.CONTENT_W, G.pt(60),
         title,
         bold=True, size_pt=G.FONT_TITLE,
         color_hex=title_color,

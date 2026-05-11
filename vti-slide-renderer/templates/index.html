@@ -424,6 +424,87 @@
       overflow-y: auto;
     }
 
+    /* ── SVG Tab ── */
+    .svg-description {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+    }
+    .svg-description strong { color: #5EC4B0; }
+
+    .svg-deck-title {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+    }
+    .svg-deck-title:focus { border-color: #5EC4B0; }
+
+    .svg-slides-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .svg-slide-entry {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .svg-slide-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #5EC4B0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .svg-slide-label .remove-slide-btn {
+      background: none;
+      border: none;
+      color: var(--red);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0 4px;
+      opacity: 0.7;
+    }
+    .svg-slide-label .remove-slide-btn:hover { opacity: 1; }
+
+    textarea.svg-input {
+      width: 100%;
+      min-height: 180px;
+      padding: 10px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    textarea.svg-input:focus { border-color: #5EC4B0; }
+
+    .btn-teal { background: #1E9E8A; color: #fff; }
+    .btn-teal:not(:disabled):hover { background: #5EC4B0; color: #0a1a14; }
+    .mode-badge.mode-svg { background: rgba(30,158,138,0.2); color: #5EC4B0; border: 1px solid #1E9E8A; }
+
     /* Responsive */
     @media (max-width: 720px) {
       main { grid-template-columns: 1fr; }
@@ -452,6 +533,9 @@
       </button>
       <button class="tab-btn" id="tab-json-btn" onclick="switchTab('json')">
         <span class="tab-icon">{ }</span> JSON → PPTX
+      </button>
+      <button class="tab-btn" id="tab-svg-btn" onclick="switchTab('svg')">
+        <span class="tab-icon">&#9671;</span> SVG → PPTX
       </button>
     </div>
 
@@ -544,6 +628,37 @@ Tạo bài thuyết trình giới thiệu sản phẩm phần mềm quản lý n
       </div>
     </div>
 
+    <!-- Tab 3: SVG → PPTX -->
+    <div class="tab-content" id="tab-svg">
+
+      <div class="svg-description">
+        Dán <strong>SVG code</strong> từ bất kỳ AI nào (ChatGPT, Claude, Gemini…).
+        Mỗi SVG = một slide. Hệ thống parse SVG và tạo PPTX editable.<br>
+        <strong>Hỗ trợ:</strong> &lt;rect&gt; &lt;circle&gt; &lt;ellipse&gt; &lt;text&gt; &lt;tspan&gt; &lt;line&gt; &lt;image&gt; &lt;linearGradient&gt; &lt;g transform&gt;
+      </div>
+
+      <div class="form-group">
+        <label class="field-label" for="svg-deck-title">Tên file PPTX</label>
+        <input class="svg-deck-title" type="text" id="svg-deck-title"
+               placeholder="Tên bài thuyết trình" value="presentation">
+      </div>
+
+      <div class="panel-label">Danh sách Slide (mỗi textarea = 1 slide)</div>
+
+      <div class="svg-slides-list" id="svg-slides-list">
+        <!-- Slide entries injected by JS -->
+      </div>
+
+      <div class="editor-footer" style="flex-wrap:wrap; gap:8px;">
+        <button class="btn btn-teal" id="svg-btn" onclick="doSVGRender()">
+          <span id="svg-icon">&#9671;</span> Tạo PPTX từ SVG
+        </button>
+        <button class="btn btn-ghost" onclick="addSVGSlide()">+ Thêm slide</button>
+        <button class="btn btn-ghost" onclick="removeLastSVGSlide()">− Xoá slide cuối</button>
+        <button class="btn btn-ghost" onclick="loadSampleSVG()">Mẫu SVG</button>
+      </div>
+    </div>
+
   </section>
 
   <!-- Right: status & download -->
@@ -600,7 +715,7 @@ Tạo bài thuyết trình giới thiệu sản phẩm phần mềm quản lý n
       <div class="schema-hint">
         <strong>Bắt buộc:</strong><br>
         <span class="field-required">deck_meta</span>: <code>theme</code>, <code>lang</code>, <code>title</code><br>
-        <span class="field-required">slides[]</span>: <code>slide_number</code>, <code>layout</code>, <code>section_idx</code>, <code>design</code><br><br>
+        <span class="field-required">slides[]</span>: <code>slide_number</code>, <code>layout</code>, <code>design</code><br><br>
         <strong>Layout hợp lệ:</strong><br>
         <code>I A B C D E F G H J K L M</code>
       </div>
@@ -608,6 +723,20 @@ Tạo bài thuyết trình giới thiệu sản phẩm phần mềm quản lý n
         <summary>Xem mẫu JSON đầy đủ</summary>
         <pre id="sample-preview"></pre>
       </details>
+    </div>
+
+    <div id="hint-svg" style="display:none">
+      <div class="section-title">Gợi ý SVG</div>
+      <div class="schema-hint" style="border-color:var(--border);">
+        <strong style="color:var(--text)">Prompt mẫu cho AI:</strong><br>
+        <code style="color:#5EC4B0;background:rgba(30,158,138,0.1);">Tạo SVG slide 1280×720px, viewBox="0 0 1280 720", dùng rect/text/circle/linearGradient, không dùng foreignObject hay clip-path phức tạp.</code><br><br>
+        <strong style="color:var(--text)">Coordinate system:</strong><br>
+        viewBox <code>0 0 1280 720</code> → map 1:1 với slide PPTX<br><br>
+        <strong style="color:var(--text)">Phần tử hỗ trợ:</strong><br>
+        <code>rect</code> <code>circle</code> <code>ellipse</code> <code>text</code><br>
+        <code>tspan</code> <code>line</code> <code>image</code> <code>g</code><br>
+        <code>linearGradient</code> trong <code>defs</code>
+      </div>
     </div>
 
   </aside>
@@ -669,25 +798,35 @@ Tạo bài thuyết trình giới thiệu sản phẩm phần mềm quản lý n
     _activeTab = tab;
     document.getElementById('tab-ai').classList.toggle('active', tab === 'ai');
     document.getElementById('tab-json').classList.toggle('active', tab === 'json');
+    document.getElementById('tab-svg').classList.toggle('active', tab === 'svg');
     document.getElementById('tab-ai-btn').classList.toggle('active', tab === 'ai');
     document.getElementById('tab-json-btn').classList.toggle('active', tab === 'json');
+    document.getElementById('tab-svg-btn').classList.toggle('active', tab === 'svg');
 
     const modeBadge = document.getElementById('mode-badge');
     const hintAI    = document.getElementById('hint-ai');
     const hintJSON  = document.getElementById('hint-json');
+    const hintSVG   = document.getElementById('hint-svg');
+
+    hintAI.style.display   = 'none';
+    hintJSON.style.display = 'none';
+    hintSVG.style.display  = 'none';
 
     if (tab === 'ai') {
       modeBadge.className = 'mode-badge mode-ai';
       modeBadge.textContent = '✦ Chế độ: Vertex AI';
-      hintAI.style.display   = '';
-      hintJSON.style.display = 'none';
+      hintAI.style.display = '';
       setStatus('idle', 'Sẵn sàng…');
-    } else {
+    } else if (tab === 'json') {
       modeBadge.className = 'mode-badge mode-json';
       modeBadge.textContent = '{ } Chế độ: JSON';
-      hintAI.style.display   = 'none';
       hintJSON.style.display = '';
       setStatus('idle', 'Chờ JSON…');
+    } else {
+      modeBadge.className = 'mode-badge mode-svg';
+      modeBadge.textContent = '◇ Chế độ: SVG → PPTX';
+      hintSVG.style.display = '';
+      setStatus('idle', 'Chờ SVG…');
     }
 
     hideError();
@@ -878,6 +1017,139 @@ Tạo bài thuyết trình giới thiệu sản phẩm phần mềm quản lý n
       setLoadingRender(false);
     }
   }
+  // ── Mode 3: SVG → PPTX ──
+
+  let _svgSlideCount = 0;
+
+  function addSVGSlide(svgContent) {
+    _svgSlideCount++;
+    const list = document.getElementById('svg-slides-list');
+    const entry = document.createElement('div');
+    entry.className = 'svg-slide-entry';
+    entry.dataset.idx = _svgSlideCount;
+    entry.innerHTML = `
+      <div class="svg-slide-label">
+        <span>Slide ${_svgSlideCount}</span>
+        <button class="remove-slide-btn" onclick="removeSVGSlide(this)" title="Xoá slide này">✕ Xoá</button>
+      </div>
+      <textarea class="svg-input" placeholder='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">&#10;  <!-- SVG content here -->&#10;</svg>'>${svgContent || ''}</textarea>
+    `;
+    list.appendChild(entry);
+    return entry.querySelector('textarea');
+  }
+
+  function removeSVGSlide(btn) {
+    const entry = btn.closest('.svg-slide-entry');
+    entry.remove();
+    // Re-label remaining slides
+    document.querySelectorAll('.svg-slide-entry').forEach((el, i) => {
+      el.querySelector('.svg-slide-label span').textContent = `Slide ${i + 1}`;
+    });
+    _svgSlideCount = document.querySelectorAll('.svg-slide-entry').length;
+  }
+
+  function removeLastSVGSlide() {
+    const entries = document.querySelectorAll('.svg-slide-entry');
+    if (entries.length > 1) {
+      entries[entries.length - 1].remove();
+      _svgSlideCount = entries.length - 1;
+    }
+  }
+
+  function loadSampleSVG() {
+    const sample = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#EEF4FB"/>
+    </linearGradient>
+    <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" style="stop-color:#172759"/>
+      <stop offset="100%" style="stop-color:#2362B0"/>
+    </linearGradient>
+    <linearGradient id="divGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" style="stop-color:#2362B0"/>
+      <stop offset="100%" style="stop-color:#7FC236"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1280" height="720" fill="url(#bgGrad)"/>
+  <!-- Left bar -->
+  <rect width="14" height="720" fill="url(#barGrad)"/>
+  <!-- Right card -->
+  <rect x="570" y="80" width="410" height="600" rx="12" fill="#EBF4FC" stroke="#7FC236" stroke-width="4"/>
+  <!-- Divider bar -->
+  <rect x="51" y="390" width="356" height="6" rx="3" fill="url(#divGrad)"/>
+  <!-- Tag -->
+  <text x="51" y="155" font-size="20" font-weight="bold" font-family="Calibri" fill="#2362B0">VTI INNOVATION</text>
+  <!-- Title -->
+  <text x="51" y="250" font-size="64" font-weight="bold" font-family="Calibri" fill="#172759">AI Slide</text>
+  <text x="51" y="330" font-size="64" font-weight="bold" font-family="Calibri" fill="#172759">Generator</text>
+  <!-- Subtitle -->
+  <text x="51" y="445" font-size="32" font-family="Calibri" fill="#1C2D4F">Tạo slide chuyên nghiệp từ SVG</text>
+  <!-- Footer badge -->
+  <rect x="48" y="664" width="56" height="46" rx="4" fill="#408DD6"/>
+  <text x="76" y="693" font-size="20" font-weight="bold" font-family="Calibri" fill="white" text-anchor="middle">1</text>
+  <text x="115" y="690" font-size="12" font-family="Calibri" fill="#808080">Copyright © 2026 VTI All rights reserved</text>
+</svg>`;
+
+    // Clear existing and add one slide with sample
+    const list = document.getElementById('svg-slides-list');
+    list.innerHTML = '';
+    _svgSlideCount = 0;
+    const ta = addSVGSlide(sample);
+    ta.style.minHeight = '240px';
+  }
+
+  function setLoadingSVG(on) {
+    const btn = document.getElementById('svg-btn');
+    const icon = document.getElementById('svg-icon');
+    btn.disabled = on;
+    icon.innerHTML = on ? '<span class="spinner"></span>' : '&#9671;';
+  }
+
+  async function doSVGRender() {
+    hideError();
+    dlArea.classList.remove('visible');
+
+    const textareas = document.querySelectorAll('#svg-slides-list textarea.svg-input');
+    if (!textareas.length) {
+      showError('Vui lòng thêm ít nhất 1 slide SVG.');
+      return;
+    }
+
+    const slides = [];
+    for (let i = 0; i < textareas.length; i++) {
+      const svg = textareas[i].value.trim();
+      if (!svg) {
+        showError(`Slide ${i + 1} trống. Vui lòng nhập SVG hoặc xoá slide đó.`);
+        return;
+      }
+      slides.push(svg);
+    }
+
+    const title = document.getElementById('svg-deck-title').value.trim() || 'presentation';
+
+    setLoadingSVG(true);
+    setStatus('loading', `Đang chuyển đổi ${slides.length} slide SVG…`);
+
+    try {
+      const resp = await fetch('/svg-to-pptx', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, slides })
+      });
+      await handlePPTXResponse(resp);
+    } catch (e) {
+      showError('Lỗi mạng:\n' + e.message);
+      setStatus('err', 'Lỗi kết nối');
+    } finally {
+      setLoadingSVG(false);
+    }
+  }
+
+  // Initialise with 1 empty SVG slide
+  addSVGSlide();
 </script>
 </body>
 </html>

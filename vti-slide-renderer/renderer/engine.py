@@ -8,6 +8,7 @@ from pptx.util import Emu
 from . import geometry as G
 from .validator import validate
 from .design_system import resolve_deck
+from .html_renderer import VISUAL_LAYOUTS, render_to_png
 from .layouts import (
     cover, card_grid, two_col_list, flow_steps, two_col_contrast,
     data_highlight, narrative, section_divider, cta, toc, timeline,
@@ -65,10 +66,22 @@ def render_deck(deck_json: dict) -> bytes:
 
     for slide_data in deck_json["slides"]:
         layout_key = slide_data["layout"]
-        renderer = LAYOUT_MAP.get(layout_key)
-        if renderer is None:
-            raise ValueError(f"Unknown layout: {layout_key!r}")
-        renderer(prs, slide_data)
+
+        if layout_key in VISUAL_LAYOUTS:
+            # Render via Playwright → embed as full-slide PNG picture
+            png_bytes = render_to_png(layout_key, slide_data)
+            blank_layout = prs.slide_layouts[6]  # blank master
+            slide = prs.slides.add_slide(blank_layout)
+            slide.shapes.add_picture(
+                io.BytesIO(png_bytes),
+                Emu(0), Emu(0),
+                Emu(G.SLIDE_W), Emu(G.SLIDE_H),
+            )
+        else:
+            renderer = LAYOUT_MAP.get(layout_key)
+            if renderer is None:
+                raise ValueError(f"Unknown layout: {layout_key!r}")
+            renderer(prs, slide_data)
 
     buf = io.BytesIO()
     prs.save(buf)
